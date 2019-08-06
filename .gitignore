@@ -1,0 +1,12 @@
+chassis-node.log
+lib
+node_modules
+tmp
+*.log
+logs
+secrets
+keys
+
+.DS_Store
+
+
