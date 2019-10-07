@@ -1,8 +1,6 @@
-@target=google
-@bug=fix me quick
-Feature: Robot Web Browser
+Feature: 
+  title: Robot Web Browser
 
-@dialect=webapp
 Scenario: Google on Firefox
 
   Given I use firefox browser

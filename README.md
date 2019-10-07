@@ -53,7 +53,6 @@ To improve readability, the keyword AND can be used instead in place of the verb
 
 You can influence what QA Shield understands using @dialect annotations.
 
-	@dialects=webapi
 	Feature: Verify that Google is accessible
 	
 	Background: Google Scenarios
@@ -226,11 +225,11 @@ Backgrounds are similar to scenarios, except they do not support annotations.
 
 Any feature can contain a background, in which case the steps that carried out before each scenario.
 
-
+```
 	Background: Authenticate
-	
-		GIVEN I login
-		AND I use a valid client certificate
+	GIVEN I login
+	AND I use a valid client certificate
+```
 
 I want to know how it works
 ===========================
@@ -260,11 +259,13 @@ It's useful to document your intentions or to prevent a statement from running, 
 Simple, place a # before any line and it will be ignored by QA Shield.
 
 	# This is ignored by the parser
+```
 	Scenario: Comments Example
 
 		Given I am using comments
 		# Then I fail
 		Then I succeed
+```
 
 Instead, you should use @skip or @todo before a Feature: or Scenario: definition.
  

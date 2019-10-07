@@ -28,9 +28,6 @@ Take a Break
 Additional Dialects
 ===================
 
-Additional dialects can be included using the @dialects annotation.
-
-	@dialect=webapi
 
 	Scenario:
 		Given I am googling
