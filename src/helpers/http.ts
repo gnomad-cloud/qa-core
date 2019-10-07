@@ -160,6 +160,7 @@ export class HTTP {
                 //            self.response.body = JSON.parse(self.response.body);
             }
 
+            // console.log("http response: %o --> %o", vars, response?response.body:"NONE");
             done(false, response);
         };
     }

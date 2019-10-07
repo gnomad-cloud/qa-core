@@ -151,12 +151,14 @@ export class Engine {
    */
 
    feature(scope: FeatureScope, featured: FeatureExport, _rs: ResultSet): Promise<ResultSet> {
-    console.log("FEATURED: %o", featured);
     return new Promise<ResultSet>((resolve, reject) => {
       let results = _rs || new ResultSet();
+      console.log("FEATURE: %o", featured);
+      let self = this;
       mapSeries(
         featured.scenarios,
         (scenario: ScenarioExport, scenario_done) => {
+          console.log("Scenario: %o", scenario);
           let result = new ScenarioResult(scenario);
           try {
             /*
@@ -166,7 +168,7 @@ export class Engine {
               scenario.steps,
               function(step, next) {
                 console.log("STEP: %o", step);
-                this.yadda.run(step, scope, next);
+                self.yadda.run(step, scope, next);
               },
               (err: any, _scenario_results) => {
                 console.log(
@@ -181,7 +183,7 @@ export class Engine {
             );
           } catch (err) {
             result.failed(err.message);
-            console.log("OOPS: %o", err.message);
+            console.error("OOPS: %o ", err);
             results.finished(result);
             scenario_done(err, result);
           }

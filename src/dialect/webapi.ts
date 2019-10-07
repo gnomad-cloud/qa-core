@@ -610,11 +610,7 @@ export class WebAPIDialect extends Dialect {
 		 */
 
 		this.define(["I GET $resource", "I GET from $resource"], function (this: any, resource: string, done: Function) {
-			console.log("CMD: %o -> %o", resource, this);
 			let cmd = HTTP.command("GET", resource, this.request, this.target);
-
-			//        cmd.json = this.request.headers['Content-Type'] == "application/json" || false;
-
 			request(cmd, HTTP.handleResponse(this, done));
 		});
 

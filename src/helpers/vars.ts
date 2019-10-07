@@ -139,13 +139,14 @@ export class Vars {
         return config;
     }
 
-    clean(mess: any) {
+    static clean(mess: any) {
         let res: any = {};
         if (!mess) return res;
 
         Object.getOwnPropertyNames(mess).forEach(function(key) {
             res[key] = mess[key];
         }, mess);
+
         return res;
     }
 };

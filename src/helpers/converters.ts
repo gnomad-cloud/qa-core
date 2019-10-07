@@ -4,6 +4,7 @@ import * as yaml from "js-yaml";
 import { FeatureParser } from "yadda/lib/parsers";
 var csv2json = require("csvtojson").Converter;
 // var yaml = require("js-yaml");
+import * as fs from "fs";
 
 export class Converters {
 
@@ -20,7 +21,8 @@ export class Converters {
         return feature;
     }
 
-    static json_or_yaml(raw: any, done: Function) {
+    static json_or_yaml(filename: any, done: Function) {
+        let raw: string = fs.readFileSync(filename).toString();
         try {
             return this.json(raw, done);
         } catch(_not_json) {
