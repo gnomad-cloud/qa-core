@@ -1,3 +1,6 @@
+import { converters } from "yadda";
+import { walker } from "./walker";
+
 let assert = require("assert");
 let fs = require("fs");
 let path = require("path");
@@ -44,7 +47,7 @@ export class Files {
         let configured = false;
         async.everySeries(configFiles, function(file: string, iteratee: Function) {
             if (self.exists(file)) {
-                self.parse(file, function(filename: string, json: any, err: any) {
+                self.parse(file, function(_filename: string, json: any, _err: any) {
                     _.extend(config, json);
                     _.extend(config.paths, json.paths);
                     configured = true;
@@ -101,14 +104,15 @@ export class Files {
 
     static convert(file: string, raw: string, onFound: Function) {
         let format = this.extension(file);
-        let converter = false; // converts[format];
+        let convert = converters as any;
+        let converter = convert[format] as Function;
         if (!converter) {
             onFound?onFound(file, raw):raw;
         } else {
-            // converter(raw, function(err: any, json: any) {
-            //     assert(!err, format+" not valid: "+file+" --> ");
-            //     onFound?onFound(file, json, err):json;
-            // })
+            converter(raw, function(err: any, json: any) {
+                assert(!err, format+" not valid: "+file+" --> ");
+                onFound?onFound(file, json, err):json;
+            })
         }
     }
 
@@ -167,6 +171,15 @@ export class Files {
         assert(path, "Missing path");
         if (!filter) return true;
         return path.indexOf(filter)>=0;
+    }
+
+    static walk(from: string, _filter: string): Promise<string[]> {
+        return new Promise<string[]>( (resolve, reject) => {
+            walker.walk(from, (err, results) => {
+                if (err) reject([ err.message ]);
+                else resolve(results);
+            });
+        });
     }
 
     static find(from: string, filter: string, onFound: Function) {

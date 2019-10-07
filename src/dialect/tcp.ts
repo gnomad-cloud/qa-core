@@ -150,7 +150,7 @@ export class TCPDialect extends Dialect {
                 } catch (err) {
                     self.dns[type].error = err;
                 }
-            }, function (err: any) {
+            }, function (_err: any) {
                 done();
             });
 

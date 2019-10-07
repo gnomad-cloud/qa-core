@@ -4,11 +4,11 @@ import { WebAPI } from "../helpers/webapi";
 import { HTTP } from "../helpers/http";
 import { Vars } from "../helpers/vars";
 import { Files } from "../helpers/files";
-import speakeasy from "speakeasy";
-import _ from "lodash";
-import assert from "assert";
-import path from "path";
-import fs from "fs";
+import * as speakeasy from "speakeasy";
+import * as _ from "lodash";
+import * as assert from "assert";
+import * as path from "path";
+import * as fs from "fs";
 
 let request = require("request");
 
@@ -26,7 +26,6 @@ export class WebAPIDialect extends Dialect {
 
 	constructor(engine: Engine) {
 		super(engine);
-		let self = this;
 
 		/**
 		 * Add a client certificate to an HTTP request.
@@ -658,7 +657,7 @@ export class WebAPIDialect extends Dialect {
 
 		this.define("I POST $resource", function (this: any, resource: string, done: Function) {
 			let cmd = HTTP.command("POST", resource, this.request, this.target);
-			let r = request(cmd, HTTP.handleResponse(this, done));
+			request(cmd, HTTP.handleResponse(this, done));
 		});
 
 		/**
@@ -983,7 +982,7 @@ export class WebAPIDialect extends Dialect {
 			done();
 		});
 
-		this.define("cookie $cookie should exist", function (this: any, cookie: string, done: Function) {
+		this.define("cookie $cookie should exist", function (this: any, _cookie: string, done: Function) {
 			this.request.jar = HTTP.cookies();
 			done();
 		})

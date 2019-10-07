@@ -1,8 +1,8 @@
-import { Engine, FeatureScope } from "../engine";
+import { Engine } from "../engine";
 import { Dialect } from "../Dialect";
 import { Vars } from "../helpers/vars";
-import assert from "assert"
-import _ from "lodash";
+import * as assert from "assert"
+import * as _ from "lodash";
 
 /**
  * Variables

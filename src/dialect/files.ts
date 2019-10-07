@@ -2,9 +2,9 @@ import { Engine } from "../engine";
 import { Dialect } from "../Dialect";
 import { Files } from "../helpers/files";
 import { Vars } from "../helpers/vars";
-import _ from "lodash";
-import assert from "assert";
-import mkdirp from "mkdirp";
+import * as _ from "lodash";
+import * as assert from "assert";
+import * as mkdirp from "mkdirp";
 
 /**
  * File System

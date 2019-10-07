@@ -1,8 +1,8 @@
 import { Dialect } from "../Dialect";
 import { Engine } from "../engine";
 import * as child_process from 'child_process';
-import _ from "lodash";
-import assert from "assert";
+import * as _ from "lodash";
+import * as assert from "assert";
 
 /**
  * Configures the Gherkin parser with phrases that support common, useful operations

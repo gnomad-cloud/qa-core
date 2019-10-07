@@ -4,16 +4,11 @@ let assert = require('assert');
 let request = require('request'); // https://github.com/request/request
 let _ = require('lodash');
 let fs = require('fs');
-// let debug = require("debug")("meta4qa:helps:http");
 
 let jsonPath = require('JSONPath');
 let DOM = require('xmldom').DOMParser;
 let path = require('path');
 let files = require("./files");
-//let xpath = require('xpath');
-let crypto = require('crypto');
-
-let http = module.exports;
 
 export class HTTP {
     static _cookies: any = {};

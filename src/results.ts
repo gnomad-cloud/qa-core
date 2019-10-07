@@ -2,35 +2,37 @@ import { ScenarioExport } from "../node_modules/@types/yadda/lib/parsers/Feature
 
 export class ScenarioResult {
     scenario: ScenarioExport;
-    _success: boolean = true;
-    _status: string = "pending";
+    success: boolean = true;
+    status: string = "pending";
 
     constructor(scenario: ScenarioExport) {
         this.scenario = scenario;
     }
 
-    success() {
-        this._success = true;
-        this._status = "success"
+    succeeded() {
+        this.success = true;
+        this.status = "success"
     }
 
     failed(msg: string) {
-        this._success = false;
-        this._status = msg;
+        this.success = false;
+        this.status = msg;
     }
 }
 
 export class ResultSet {
     results: ScenarioResult[] = [];
-    _successes = 0;
+    successes = 0;
+    fails = 0;
 
     finished(result: ScenarioResult): void {
-        this._successes += result._success?1:0;
+        this.successes += result.success?1:0;
+        this.fails += result.success?0:1;
         this.results.push(result);
     }
 
     passed() {
-        return this.results.length==this._successes;
+        return this.results.length==this.successes;
     }
 
 } 

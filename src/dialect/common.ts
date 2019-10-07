@@ -1,9 +1,5 @@
 import { Dialect } from "../Dialect";
-import assert from "assert";
-import debug from "../../node_modules/@types/debug";
-import { Engine, FeatureScope } from "../engine";
-import { Vars } from "../helpers/vars";
-import * as child_process from 'child_process';
+import { Engine } from "../engine";
 import { StepError } from "../results";
 
 /**
@@ -22,15 +18,15 @@ export class CommonDialect extends Dialect {
 
         this.define(["I am $actor", "I am a $actor", "I am an $actor"], function (this: any, actor: string, done: Function) {
             this.name = actor;
-            console.log("My name is: %o (%o)", actor, this);
+            console.log("My name is: %o", actor);
             done();
         });
 
-        this.define(["I fail"], function (this: any, done: Function) {
+        this.define(["I fail"], function (this: any, _done: Function) {
             throw new Error("Deliberate Fail");
         });
 
-        this.define(["I fail with $msg"], function (this: any, msg: string, done: Function) {
+        this.define(["I fail with $msg"], function (this: any, msg: string, _done: Function) {
             throw new StepError("Deliberate Fail: " + msg);
         });
 

@@ -1,10 +1,10 @@
 // var tls = require('tls');
 // var assert = require('assert');
 // var net = require("net");
-import _ from "lodash";
-import net from "net";
-import assert from "assert";
-import tls from "tls";
+import * as _ from "lodash";
+import * as net from "net";
+import * as assert from "assert";
+import * as tls from "tls";
 
 export class TCP {
 
@@ -40,7 +40,6 @@ export class TCP {
         assert(done, "Missing callback");
 
         options = _.extend({ rejectUnauthorized: false }, options);
-        let self = this;
 
         if (!options.legacy) {
             options.servername = hostname;

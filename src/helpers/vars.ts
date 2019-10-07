@@ -84,7 +84,7 @@ export class Vars {
 
     static leaking(key: string) {
         Object.defineProperty(global, key, {
-            set (value) {
+            set (_value: any) {
                 throw new Error("Global Leak: "+key);
             }
         });
@@ -149,16 +149,3 @@ export class Vars {
         return res;
     }
 };
-
-// SELF TESTS
-
-let test = {}
-/*
- assert(this.set(test, "hello.world", "hi")=="hi", "No Hi");
-assert(test.hello, "No Hello")
-assert(test.hello.world, "No Hello World")
-assert(test.hello.world=="hi", "No Hi World")
-this.env("AFFIRM_", { "AFFIRM_HELLO_WORLD": "greetings" }, test)
-assert(test.hello.world=="greetings", "No Greeting")
-*/
-

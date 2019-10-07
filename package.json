@@ -1,8 +1,9 @@
 {
-  "name": "meta4qa-engine",
-  "version": "0.0.1",
-  "description": "",
+  "name": "qa-engine",
+  "version": "0.1.2",
+  "description": "QA Engine Library",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +13,7 @@
     "@types/assert": "^1.4.3",
     "@types/async": "^3.0.1",
     "@types/debug": "^4.1.4",
+    "@types/js-yaml": "^3.12.1",
     "@types/lodash": "^4.14.136",
     "@types/mkdirp": "^0.5.2",
     "@types/request": "^2.48.2",

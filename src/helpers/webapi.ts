@@ -5,9 +5,6 @@ import * as _ from "lodash";
 let assert = require('assert');
 let debug = require("debug")("meta4qa:helps:webapi");
 
-let tls = require('tls');
-let net = require("net");
-
 export class WebAPI {
 
     static EXT_TO_MIME: any = {

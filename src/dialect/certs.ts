@@ -1,7 +1,7 @@
 import { Dialect } from "../Dialect";
 import { Engine } from "../engine";
 import { TCP } from "../helpers/tcp";
-import _ from "lodash";
+import * as _ from "lodash";
 import { Vars } from "../helpers/vars";
 
 var assert = require('assert');
