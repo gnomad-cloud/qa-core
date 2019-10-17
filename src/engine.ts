@@ -5,8 +5,7 @@ import { ScenarioResult, ResultSet } from "./results";
 import { Dialect } from "./Dialect";
 import { EventEmitter } from "events";
 import { Converters } from "./helpers/converters";
-import { mapSeries } from "async";
-import { Files } from "./helpers/files";
+import * as glob from 'glob';
 
 export class FeatureScope extends Context {
   constructor(defaults?: any) {
@@ -100,32 +99,34 @@ export class Engine {
     return scope;
   }
 
-/**
-   * Read files and execute a Gherkin Feature as string (set of scenarios/steps)
-   *
-   * @param feature
-   */
+  /**
+     * Read files and execute a Gherkin Feature as string (set of scenarios/steps)
+     *
+     * @param feature
+     */
 
-   read(scope: FeatureScope, folder: string): Promise<ResultSet> {
-       return new Promise<ResultSet>( (reject, resolve) => {
-         let results = new ResultSet();
-         console.log("walker: %o", folder);
-         Files.walk(folder, null).then( (files) => {
-          console.log("walked: %o", files)
-          files.forEach( file => {
-                 Converters.json_or_yaml(file, (_err: any, json: any) => {
-                    let featured = json as FeatureExport;
-                    console.log("json: (%s) %s -<> %o", _err, file, json);
-                    this.feature(scope, featured, results);
-                 });
-            })
-        }).catch( (err) => {
-          console.log("read error: %s -> %s", folder, err);
-            reject(err);
-        });
+  read(scope: FeatureScope, folder: string): Promise<ResultSet> {
+    const self = this;
+
+    return new Promise<ResultSet>((resolve, reject) => {
+      let results = new ResultSet();
+      console.log("walker: %o", folder);
+      try {
+        const files = glob.sync(folder + '**/*')
+        console.log("walked: %o", files)
+        files.forEach(file => {
+          Converters.json_or_yaml(file, async (_err: any, json: any) => {
+            let featured = json as FeatureExport;
+            console.log("json: (%s) %s -<> %o", _err, file, json);
+            results = await self.feature(scope, featured, results);
+          });
+        })
         resolve(results);
+      } catch (e) {
+        reject(e);
+      }
     });
-   }
+  }
 
   /**
    * Parse and execute a Gherkin Feature as string (set of scenarios/steps)
@@ -134,9 +135,10 @@ export class Engine {
    */
   run(feature: string, options?: any): Promise<ResultSet> {
     let scope = this.scope(options);
+    const self = this;
     return new Promise<ResultSet>((resolve, reject) => {
-      this.parser.parse(feature, function(featured: FeatureExport) {
-        this.featured(scope, featured, null)
+      this.parser.parse(feature, function (featured: FeatureExport) {
+        self.feature(scope, featured, null)
           .then(resolve)
           .catch(reject);
       });
@@ -150,53 +152,40 @@ export class Engine {
    * @param feature
    */
 
-   feature(scope: FeatureScope, featured: FeatureExport, _rs: ResultSet): Promise<ResultSet> {
-    return new Promise<ResultSet>((resolve, reject) => {
+  feature(scope: FeatureScope, featured: FeatureExport, _rs: ResultSet): Promise<ResultSet> {
+
+    return new Promise<ResultSet>(async (resolve, reject) => {
       let results = _rs || new ResultSet();
       console.log("FEATURE: %o", featured);
       let self = this;
-      mapSeries(
-        featured.scenarios,
-        (scenario: ScenarioExport, scenario_done) => {
+
+      try {
+        featured.scenarios.forEach((scenario: ScenarioExport) => {
           console.log("Scenario: %o", scenario);
           let result = new ScenarioResult(scenario);
           try {
             /*
-             * execute each step using Yadda
-             */
-            mapSeries(
-              scenario.steps,
-              function(step, next) {
-                console.log("STEP: %o", step);
-                self.yadda.run(step, scope, next);
-              },
-              (err: any, _scenario_results) => {
-                console.log(
-                  "SCENARIO: %o --> %o",
-                  scenario.title,
-                  err ? err : "ok"
-                );
-                err ? result.failed(err.message) : result.succeeded();
-                results.finished(result);
-                scenario_done(err, result);
-              }
-            );
+            * execute each step using Yadda
+            */
+            scenario.steps.forEach((step) => {
+              console.log("STEP: %o", step);
+              self.yadda.run(step, scope, () => {
+              });
+            });
+            result.succeeded();
+            results.finished(result);
+
           } catch (err) {
             result.failed(err.message);
             console.error("OOPS: %o ", err);
             results.finished(result);
-            scenario_done(err, result);
           }
-        },
-        (err, _results: any) => {
-          console.log("PASSED: %o", results.passed());
-          if (err) {
-            reject(results);
-          } else {
-            resolve(results);
-          }
-        }
-      );
+        });
+
+        resolve(results);
+      } catch (e) {
+        reject(e);
+      }
     });
   }
 }
