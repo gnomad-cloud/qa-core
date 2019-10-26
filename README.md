@@ -1,4 +1,4 @@
-Gherkin / BDD Test Automation
+# QA-Engine - Gherkin / BDD Test Automation
 ==============================
 
 QA Shield is an BDD test automation and orchestration tool for software teams. 
