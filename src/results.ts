@@ -1,4 +1,4 @@
-import { ScenarioExport } from "../node_modules/@types/yadda/lib/parsers/FeatureParser";
+import { ScenarioExport } from "yadda/lib/parsers/FeatureParser";
 
 export class ScenarioResult {
     scenario: ScenarioExport;
