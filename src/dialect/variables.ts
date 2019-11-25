@@ -15,7 +15,7 @@ import * as _ from "lodash";
 
 export class VarsDialect extends Dialect {
 
-	constructor(engine: Engine) {
+	constructor(protected engine: Engine) {
 		super(engine);
 		let self = this;
 		// ***** GIVEN *****
@@ -90,7 +90,6 @@ export class VarsDialect extends Dialect {
 		this.define(["I convert $varname to text"], function (this: any, name: string, done: Function) {
 			let original = Vars.find(this, name);
 			Vars.set(this, name, JSON.stringify(original));
-
 			done();
 		});
 
@@ -355,9 +354,7 @@ export class VarsDialect extends Dialect {
 		this.define(["$path in $varname should match $regex", "$path in $varname must match $regex", 
 					"$path in $varname matches $regex"], function (this: any, path: string, name: string, regex: string, done: Function) {
 			let value = Vars.findNamed(this, name);
-			//        debug("VALUE: %j in %s -> %j", value, name, this);
 			assert(value, "Variable " + name + " does not exist");
-			//        debug("found: %s -> %j", name, value);
 			let found = Vars.findInPath(value, path);
 			engine.debug("found: %s in %s -> %j", path, name, found);
 			assert(found, "Path " + path + " not found in " + name);

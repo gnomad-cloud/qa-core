@@ -19,12 +19,11 @@ export class CommonDialect extends Dialect {
 
         this.define(["I am $actor", "I am a $actor", "I am an $actor"], function (this: any, actor: string, done: Function) {
             this.name = actor;
-            console.log("My name is: %o", actor);
             done();
         });
 
         this.define(["I fail"], function (this: any, _done: Function) {
-            throw new Error("Deliberate Fail");
+            throw new StepError("Deliberate Fail", this);
         });
 
         this.define(["I fail with $msg"], function (this: any, msg: string, _done: Function) {

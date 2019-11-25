@@ -110,14 +110,12 @@ export class Engine {
 
     return new Promise<ResultSet>((resolve, reject) => {
       let results = new ResultSet();
-      console.log("walker: %o", folder);
       try {
-        const files = glob.sync(folder + '**/*')
-        console.log("walked: %o", files)
+        const files = glob.sync(folder + '**/*');
+
         files.forEach(file => {
-          Converters.json_or_yaml(file, async (_err: any, json: any) => {
+          Converters.load_feature(file, async (_err: any, json: any) => {
             let featured = json as FeatureExport;
-            console.log("json: (%s) %s -<> %o", _err, file, json);
             results = await self.execute(scope, featured, results);
           });
         })
@@ -160,37 +158,40 @@ export class Engine {
       let results = _rs || new ResultSet();
       // console.log("FEATURE: %o", featured);
       let self = this;
+      this.bus.emit("feature", { feature: featured });
 
       let feature_results = results.feature( featured );
 
       try {
         featured.scenarios.forEach((scenario: ScenarioExport) => {
 
-          let scenario_result = feature_results.scenario(scenario);
+            let scenario_result = feature_results.scenario(scenario);
 
-          console.log("Scenario: %o", scenario);
-          try {
-            /*
-            * execute each step using Yadda
-            */
-            scenario.steps.forEach((step) => {
-              self.yadda.run(step, scope, (err) => {
-                if (err) reject( this.toError(err));
-                // console.log("STEP: %o -> %o", step, err);
+            try {
+              this.bus.emit("scenario", { scope: scope, feature: featured, scenario: scenario, result: scenario_result });
+              // execute each step using Yadda
+              scenario.steps.forEach((step) => {
+                self.yadda.run(step, scope, (err) => {
+                  if (err) {
+                    this.bus.emit("step:failed", { scope: scope, feature: featured, scenario: scenario, step: step, error: err });
+                    reject( this.toError(err));
+                  } else {
+                    this.bus.emit("step", { scope: scope, feature: featured, scenario: scenario, step: step || "??" });
+                  }
+                });
               });
-            });
-            scenario_result.pass();
+              scenario_result.pass();
 
-          } catch (err) {
-            // console.error("OOPS: %o ", err);
-            scenario_result.fail(err.message);
-          }
-        });
+            } catch (err) {
+              // console.error("OOPS: %o ", err);
+              scenario_result.fail(err.message);
+            }
+          });
 
-        resolve(results);
-      } catch (err) {
-        reject( this.toError(err) );
-      }
+          resolve(results);
+        } catch (err) {
+          reject( this.toError(err) );
+        }
     });
   }
 

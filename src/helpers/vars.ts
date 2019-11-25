@@ -149,4 +149,10 @@ export class Vars {
 
         return res;
     }
+
+    static suffix(text: string, char: string) {
+        let ix = text.lastIndexOf(char);
+        if (ix<1) return null;
+        return text.substring(ix+1);
+    }
 };

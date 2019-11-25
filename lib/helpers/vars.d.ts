@@ -15,4 +15,5 @@ export declare class Vars {
     static set(o: any, s: string, v: any): any;
     static env(prefix: string, env: any, config: any): any;
     static clean(mess: any): any;
+    static suffix(text: string, char: string): string;
 }

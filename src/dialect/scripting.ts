@@ -52,7 +52,7 @@ export class ScriptingDialect extends Dialect {
 
 		this.define(["I execute $javascript", "I execute\n$javascript"], function (this: any, js: string, done: Function) {
 			var fn = new Function(js);
-			var result = fn.apply(self);
+			var result = fn.apply(this);
 			if (typeof (result) != "undefined") {
 				assert(result, "Javascript return 'falsey'");
 			}
@@ -73,7 +73,7 @@ export class ScriptingDialect extends Dialect {
 
 		this.define(["I assert $javascript", "I expect $javascript"], function (this: any, js: string, done: Function) {
 			var fn = new Function("return (" + js + ");");
-			var result = fn.apply(self);
+			var result = fn.apply(this);
 			assert(result, "Javascript assert: " + js + " --> " + result);
 			done();
 		});

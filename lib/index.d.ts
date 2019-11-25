@@ -8,4 +8,5 @@ import { ScriptingDialect } from "./dialect/scripting";
 import { WebAPIDialect } from "./dialect/webapi";
 import { X509Dialect } from "./dialect/certs";
 import { TCPDialect } from "./dialect/tcp";
-export { Engine, ResultSet, CommonDialect, ProcessesDialect, FilesDialect, VarsDialect, ScriptingDialect, WebAPIDialect, X509Dialect, TCPDialect, StepError, ScenarioResult };
+import { Vars, Files, Converters } from "./helpers";
+export { Engine, ResultSet, CommonDialect, ProcessesDialect, FilesDialect, VarsDialect, ScriptingDialect, WebAPIDialect, X509Dialect, TCPDialect, StepError, ScenarioResult, Vars, Files, Converters };

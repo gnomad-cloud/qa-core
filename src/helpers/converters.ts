@@ -5,6 +5,8 @@ import { FeatureParser } from "yadda/lib/parsers";
 var csv2json = require("csvtojson").Converter;
 import * as fs from "fs";
 import { StepError } from "../results";
+import { Vars } from "./vars";
+import { FeatureExport } from "yadda/lib/parsers/FeatureParser";
 
 export class Converters {
 
@@ -32,6 +34,18 @@ export class Converters {
                 done(_not_yaml, null);
             }
         }
+    }
+
+    static load_feature(filename: any, done: Function) {
+        let type = Vars.suffix(filename, ".");
+        if (!type) done( "invalid file", null);
+        if (type == "feature") {
+            let fp = new FeatureParser();
+            let raw: string = fs.readFileSync(filename).toString();
+            fp.parse(raw, (feature: FeatureExport) => {
+                done(null, feature);
+            });
+        } else this.json_or_yaml(filename, done);
     }
 
     public static load(raw: string, format: string, done: Function) {

@@ -9,5 +9,6 @@ import { Dialect } from "../Dialect";
  *
  */
 export declare class VarsDialect extends Dialect {
+    protected engine: Engine;
     constructor(engine: Engine);
 }
