@@ -436,7 +436,7 @@ export class VarsDialect extends Dialect {
 
         this.define(["dump $varname", "I dump $varname"], function (this: any, name: string, done: Function) {
             var found = name == "this" ? this : Vars.findNamed(this, name);
-            console.log("DUMP: %s ==> %o", name, (found || "Not Found"));
+            console.table( [found] );
             done();
         });
 
