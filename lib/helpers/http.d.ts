@@ -23,7 +23,7 @@ export declare class HTTP {
         strictSSL: boolean;
         rejectUnauthorized: boolean;
     };
-    static detectContentType(payload: string): "json" | "xml" | "string";
+    static detectContentType(payload: string): "json" | "string" | "xml";
     static parse(payload: string): any;
     static detectFileType(file: string): string;
     static header(request: any, name: string, value: string): any;

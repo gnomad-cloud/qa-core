@@ -116,7 +116,7 @@ export class Engine {
         files.forEach(file => {
           Converters.load_feature(file, async (_err: any, json: any) => {
             let featured = json as FeatureExport;
-            results = await self.execute(scope, featured, results);
+            results = await self.execute(scope, featured, results); // TODO: then/catch/emit
           });
         })
         resolve(results);
@@ -181,15 +181,19 @@ export class Engine {
                 });
               });
               scenario_result.pass();
+              this.bus.emit("pass", { scope: scope, feature: featured, scenario: scenario, result: scenario_result });
 
             } catch (err) {
               // console.error("OOPS: %o ", err);
               scenario_result.fail(err.message);
+              this.bus.emit("scenario:failed", { scope: scope, feature: featured, scenario: scenario, result: scenario_result, error: err });
             }
           });
 
           resolve(results);
+          this.bus.emit("finished", { scope: scope, feature: featured, scenario: scenario, results: results });
         } catch (err) {
+          this.bus.emit("feature:failed", { scope: scope, feature: featured, scenario: scenario, results: results, error: err });
           reject( this.toError(err) );
         }
     });
