@@ -1,6 +1,7 @@
 import { Dialect } from "../Dialect";
 import { Engine } from "../engine";
 import { StepError } from "../results";
+// import { StepError } from "../results";
 
 /**
  * Configures the Gherkin parser with phrases that support common, useful operations
@@ -27,7 +28,7 @@ export class CommonDialect extends Dialect {
         });
 
         this.define(["I fail with $msg"], function (this: any, msg: string, _done: Function) {
-            throw new StepError("Deliberate Fail: " + msg);
+            throw new StepError("Deliberate Fail: " + msg, this);
         });
 
         this.define(["I pass", "I do nothing", "I succeed"], function (this: any, done: Function) {

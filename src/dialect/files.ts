@@ -5,6 +5,7 @@ import { Vars } from "../helpers/vars";
 import * as _ from "lodash";
 import * as assert from "assert";
 import * as mkdirp from "mkdirp";
+import { Converters } from "../helpers/converters";
 
 /**
  * File System
@@ -32,17 +33,11 @@ export class FilesDialect extends Dialect {
 			format = format.toLowerCase();
 			let raw = Files.load(file);
 			assert(raw, format + " file is empty: " + file);
-
-			// converter(raw, function (err, json) {
-			// 	assert(!err, format + " not valid: " + file);
-			// 	helps.vars.set(self.vars, name, json);
-			// 	debug("%s loaded: %j", format, file);
-			// 	done();
-			// })
-
-			Vars.set(engine.vars, name, raw);
-			engine.debug("%s loaded: %j", format, file);
-			done();
+			Converters.load(raw, format, (_err, contents: any) => {
+				engine.debug("%s converted from: %s", file, format);
+				Vars.set(engine.vars, name, contents);
+				done();
+			});
 		});
 
 		this.define(["I mkdir $folder"], function (this: any, folder: string, done: Function) {

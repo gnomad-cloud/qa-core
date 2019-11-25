@@ -2,7 +2,7 @@
 import { Yadda, Library, Context } from "yadda";
 import { FeatureParser } from "yadda/lib/parsers";
 import { FeatureExport } from "yadda/lib/parsers/FeatureParser";
-import { ResultSet } from "./results";
+import { ResultSet, StepError } from "./results";
 import { Dialect } from "./Dialect";
 import { EventEmitter } from "events";
 export declare class FeatureScope extends Context {
@@ -43,7 +43,7 @@ export declare class Engine {
        * Read files and execute a Gherkin Feature as string (set of scenarios/steps)
        *
        * @param feature
-       */
+    */
     read(scope: FeatureScope, folder: string): Promise<ResultSet>;
     /**
      * Parse and execute a Gherkin Feature as string (set of scenarios/steps)
@@ -57,5 +57,6 @@ export declare class Engine {
      * @param scope
      * @param feature
      */
-    feature(scope: FeatureScope, featured: FeatureExport, _rs: ResultSet): Promise<ResultSet>;
+    execute(scope: FeatureScope, featured: FeatureExport, _rs: ResultSet): Promise<ResultSet>;
+    toError(err: any): StepError;
 }

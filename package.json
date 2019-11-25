@@ -1,7 +1,7 @@
 {
   "name": "qa-engine",
   "version": "0.1.7",
-  "description": "QA Engine Library",
+  "description": "QA-Engine Library",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {

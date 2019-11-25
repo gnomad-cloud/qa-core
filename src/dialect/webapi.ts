@@ -155,7 +155,6 @@ export class WebAPIDialect extends Dialect {
 		 * Use OAUTH flow to authenticate using default agent
 		 *
 		 *      I use OAuth2
-		 *
 		 *      I use oauth
 		 *
 		 * @example

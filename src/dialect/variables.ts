@@ -339,7 +339,6 @@ export class VarsDialect extends Dialect {
 		/**
 		 * Assert some JSON path within a complex variable should match a regular expression (RegExp)
 		 *
-		 *
 		 *      $.hello in $varname should match $regex
 		 *
 		 * @example
@@ -369,7 +368,6 @@ export class VarsDialect extends Dialect {
 
 		/**
 		 * Assert that any array element in JSON path within a variable should match a regular expression (RegExp)
-		 *
 		 *
 		 *      $.hello in $varname should match $regex
 		 *
@@ -430,8 +428,8 @@ export class VarsDialect extends Dialect {
 		 * @param {String} javascript - inline javascript
 		 */
 
-		this.define(["I transform $varname as $newlet with:\n$javascript", 
-				"I map $varname as $newlet with:\n$javascript"], function (this: any, varname: string, newvar: string, js: string, done: Function) {
+		this.define(["I transform $varname as $newvar with:\n$javascript", 
+				"I map $varname as $newvar with:\n$javascript"], function (this: any, varname: string, newvar: string, js: string, done: Function) {
 			let fn = new Function(js);
 			let original = Vars.find(this, varname) || [];
 			let results = _.map(original, fn);

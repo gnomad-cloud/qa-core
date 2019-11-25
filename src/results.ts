@@ -1,45 +1,89 @@
-import { ScenarioExport } from "yadda/lib/parsers/FeatureParser";
+import { ScenarioExport, FeatureExport } from "yadda/lib/parsers/FeatureParser";
+import { EventEmitter } from "events";
 
-export class ScenarioResult {
-    scenario: ScenarioExport;
-    success: boolean = true;
-    status: string = "pending";
+export class TestResult extends EventEmitter {
+    total = 0;
+    fails = 0;
+    status: string = "initial";
 
-    constructor(scenario: ScenarioExport) {
-        this.scenario = scenario;
+    watch(result: TestResult) {
+        result.on("pass", (msg?: any) => {
+            this.pass(msg);
+        });
+        result.on("fail", (msg?: any) => {
+            this.fail(msg);
+        });
     }
 
-    succeeded() {
-        this.success = true;
-        this.status = "success"
+    pass(result?: any): void {
+        this.emit("pass", result);
+        this.total++;
+        this.status = "success";
     }
 
-    failed(msg: string) {
-        this.success = false;
+    fail(message?: string): void {
+        console.error(message);
+        this.status = message;
+        this.total++;
+        this.fails++;
+        this.emit("fail", { message: message } );
+    }
+    
+    passed(): boolean {
+        return this.fails == 0;
+    }
+}
+
+export class FeatureResult extends TestResult {
+    title: string;
+    results: ScenarioResult[] = [];
+
+    constructor(feature: FeatureExport, _results: ResultSet) {
+        super();
+        this.title = feature.title;
+    }
+
+    scenario(scenario: ScenarioExport): ScenarioResult {
+        let result = new ScenarioResult(scenario, this);
+        this.results.push(result);
+        this.watch(result);
+        return result;
+    }
+
+
+    fail(msg: string) {
+        super.fail(msg);
         this.status = msg;
     }
 }
 
-export class ResultSet {
-    results: ScenarioResult[] = [];
-    successes = 0;
-    fails = 0;
+export class ScenarioResult  extends TestResult {
+    status: string = "initial";
 
-    finished(result: ScenarioResult): void {
-        this.successes += result.success?1:0;
-        this.fails += result.success?0:1;
-        this.results.push(result);
+    constructor(protected scenario: ScenarioExport, _feature: FeatureResult) {
+        super();
+    }
+}
+
+export class ResultSet extends TestResult {
+    features: FeatureResult[] = [];
+
+    constructor() {
+        super();
     }
 
-    passed() {
-        return this.results.length==this.successes;
+    feature(feature: FeatureExport):FeatureResult {
+        let result = new FeatureResult(feature, this);
+        this.watch(result);
+        this.features.push( result );
+        return result;
     }
 
 } 
 
 export class StepError extends Error {
 
-    constructor(msg: string) {
+    constructor(msg: string, protected ctx?: any) {
         super(msg);
     }
 }

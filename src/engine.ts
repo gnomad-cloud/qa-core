@@ -1,7 +1,7 @@
 import { Yadda, Library, Dictionary, Context } from "yadda";
 import { FeatureParser } from "yadda/lib/parsers";
 import { FeatureExport, ScenarioExport } from "yadda/lib/parsers/FeatureParser";
-import { ScenarioResult, ResultSet } from "./results";
+import { ResultSet, StepError } from "./results";
 import { Dialect } from "./Dialect";
 import { EventEmitter } from "events";
 import { Converters } from "./helpers/converters";
@@ -103,7 +103,7 @@ export class Engine {
      * Read files and execute a Gherkin Feature as string (set of scenarios/steps)
      *
      * @param feature
-     */
+  */
 
   read(scope: FeatureScope, folder: string): Promise<ResultSet> {
     const self = this;
@@ -118,12 +118,12 @@ export class Engine {
           Converters.json_or_yaml(file, async (_err: any, json: any) => {
             let featured = json as FeatureExport;
             console.log("json: (%s) %s -<> %o", _err, file, json);
-            results = await self.feature(scope, featured, results);
+            results = await self.execute(scope, featured, results);
           });
         })
         resolve(results);
       } catch (e) {
-        reject(e);
+        reject(this.toError(e));
       }
     });
   }
@@ -138,9 +138,11 @@ export class Engine {
     const self = this;
     return new Promise<ResultSet>((resolve, reject) => {
       this.parser.parse(feature, function (featured: FeatureExport) {
-        self.feature(scope, featured, null)
+        self.execute(scope, featured, null)
           .then(resolve)
-          .catch(reject);
+          .catch((err)=>{
+            reject(this.toError(err));
+          });
       });
     });
   }
@@ -152,40 +154,52 @@ export class Engine {
    * @param feature
    */
 
-  feature(scope: FeatureScope, featured: FeatureExport, _rs: ResultSet): Promise<ResultSet> {
+  execute(scope: FeatureScope, featured: FeatureExport, _rs: ResultSet): Promise<ResultSet> {
 
     return new Promise<ResultSet>(async (resolve, reject) => {
       let results = _rs || new ResultSet();
-      console.log("FEATURE: %o", featured);
+      // console.log("FEATURE: %o", featured);
       let self = this;
+
+      let feature_results = results.feature( featured );
 
       try {
         featured.scenarios.forEach((scenario: ScenarioExport) => {
+
+          let scenario_result = feature_results.scenario(scenario);
+
           console.log("Scenario: %o", scenario);
-          let result = new ScenarioResult(scenario);
           try {
             /*
             * execute each step using Yadda
             */
             scenario.steps.forEach((step) => {
-              console.log("STEP: %o", step);
-              self.yadda.run(step, scope, () => {
+              self.yadda.run(step, scope, (err) => {
+                if (err) reject( this.toError(err));
+                // console.log("STEP: %o -> %o", step, err);
               });
             });
-            result.succeeded();
-            results.finished(result);
+            scenario_result.pass();
 
           } catch (err) {
-            result.failed(err.message);
-            console.error("OOPS: %o ", err);
-            results.finished(result);
+            // console.error("OOPS: %o ", err);
+            scenario_result.fail(err.message);
           }
         });
 
         resolve(results);
-      } catch (e) {
-        reject(e);
+      } catch (err) {
+        reject( this.toError(err) );
       }
     });
   }
+
+
+  toError(err: any): StepError {
+    if (err instanceof StepError) return err;
+    if (err instanceof Error) return new StepError(err.message);
+    if (err instanceof String) return new StepError(err as string);
+    return new StepError("Strange Error", err);
+  }
+
 }

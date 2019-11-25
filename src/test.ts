@@ -1,7 +1,7 @@
 
 
 import { Engine } from "./engine";
-import { ResultSet, StepError } from "./results";
+import { ResultSet } from "./results";
 import { CommonDialect } from "./dialect/common";
 import { ProcessesDialect } from "./dialect/processes";
 import { FilesDialect } from "./dialect/files";
@@ -11,7 +11,7 @@ import { WebAPIDialect } from "./dialect/webapi";
 import { X509Dialect } from "./dialect/certs";
 import { TCPDialect } from "./dialect/tcp";
 
-let engine = new Engine({ started: Date.now() });
+let engine = new Engine({ started: Date.now });
 
 new X509Dialect(engine);
 new CommonDialect(engine);
@@ -23,22 +23,38 @@ new VarsDialect(engine);
 new WebAPIDialect(engine);
 
 
+// Scenario: testing
+// given I am testing
+// given I set hello to world
+// given I execute console.log('hello world');
+// Scenario: exec
+// given I run ls
+// given I exec ls
+// given I mkdir tmp/tests
+
+// given I enable redirects
+// when I GET https://google.com
+// then status code is 200
+// Scenario: final
+// when I dump name
+
+
 engine.run(`
 feature: featuring
 Scenario: test1
 given I am testing1
 given I set hello to world
 given I mkdir tmp/tests
-then I dump step
+when I dump name
 
 Scenario: test
 given I am testing2
-then I dump this
+when I dump name
 then I fail with prejudice
 `
-).then((_results: ResultSet) => {
-    console.log("success");
-}).catch((err: any) => {
-    console.log("FAILED! %o", err instanceof StepError );
+).then((results: ResultSet) => {
+    console.log("success: %o", results);
+}).catch((results: ResultSet) => {
+    console.log("finished!: %o", results);
 
 });

@@ -1,26 +1,24 @@
 # QA-Engine - Gherkin / BDD Test Automation
 ==============================
 
-QA Shield is an BDD test automation and orchestration tool for software teams. 
+QA-Engine is an BDD test automation and orchestration tool for software teams. 
 
-QA Shield uses English (Gherkin) language to describe and execute test cases for APIs and Web Apps. 
+QA-Engine uses English (Gherkin) language to describe and execute test cases for APIs and Web Apps. 
 
 Test definitions are declarative - which makes them easy to read, write and re-use.
 
 Gherkin is human and machine readable - so business analysts, testers, developers and robots can collaborate.
 
-Since tests are written in English - every stakeholder (including the Project Sponsor :-) can make sense of them.
-
-[View the PDF introduction](docs/Intro.pdf). 
+Since tests are written in English - every stakeholder can make sense of them.
 
 I want to automate testing
 ==========================
 
-With QA Shield, you write your test cases in a simplified dialect of English - called Gherkin. 
+With QA-Engine, you write your test cases in a simplified dialect of English - called Gherkin. 
 
 Traditional test scripts are often unreadable by our stakeholders and even ourselves.
 
-QA Shield uses executable English instructions - actions and assertions - that are easy to read, write and socialise.
+QA-Engine uses executable English instructions - actions and assertions - that are easy to read, write and socialise.
 
 Features are lists of related scenarios. It's the scenario's that do all the heavy lifting.
 
@@ -40,18 +38,18 @@ The Gherkin (BDD) notation for a feature / scenario is:
 
 The text following the keyword (GIVEN | WHEN | THEN) needs to match a phrase/pattern from a vocabulary.
 
-New features can be created using any simple text editor - where you'd use QA Shield's extensible vocabulary to write them.
+New features can be created using any simple text editor - where you'd use QA-Engine's extensible vocabulary to write them.
 
 You can download pre-packaged vocabularies (called Dialects) and/or roll your own with simple Javascript.
 
 I want to see a working example
 ===============================
 
-QA Shield's features are collections of individual test scenarios. 
+QA-Engine's features are collections of individual test scenarios. 
 
 To improve readability, the keyword AND can be used instead in place of the verbs above.
 
-You can influence what QA Shield understands using @dialect annotations.
+You can influence what QA-Engine understands using @dialect annotations.
 
 	Feature: Verify that Google is accessible
 	
@@ -72,64 +70,64 @@ You can influence what QA Shield understands using @dialect annotations.
 	    When I GET /
 	    Then response code should be 3xx
 
-I want to test-drive QA Shield
+I want to test-drive QA-Engine
 ======================================
 
-QA Shield is built using NodeJS. If you're new to node, pre-read [Getting Started](https://www.npmjs.com/package/QA Shield/tutorial).
+QA-Engine is built using NodeJS. If you're new to node, pre-read [Getting Started](https://www.npmjs.com/package/QA-Engine/tutorial).
 
-You install QA Shield as a system-wide CLI command:
+You install QA-Engine as a system-wide CLI command:
 
-	$ npm install QA Shield -g
+	$ npm install QA-Engine -g
 
 To run it simply type:
 
-	$ QA Shield
+	$ QA-Engine
 
 However, It won't do much else until we provide some feature scenarios.
 
-By default, QA Shield looks for ".feature" files recursively, starting in the current directory.
+By default, QA-Engine looks for ".feature" files recursively, starting in the current directory.
 
 I want to create my first feature
 =================================
 
 1) To quickly create a few examples in the ./features folder, type:
 
-		$ QA Shield --example
+		$ QA-Engine --example
 
 This will create the ./features folder and copy some simple examples.
 
-It will also write your default configuration to ./QA Shield.json
+It will also write your default configuration to ./QA-Engine.json
 
-It won't damage if you run it again, except re-save your ./QA Shield.json config.
+It won't damage if you run it again, except re-save your ./QA-Engine.json config.
 
-Or, you can just create the ./features folder and a default "QA Shield.json" without the examples:
+Or, you can just create the ./features folder and a default "QA-Engine.json" without the examples:
 
-	$ QA Shield --initialize
+	$ QA-Engine --initialize
 
 2) To execute your example ".feature" files, type:
 
-		$ QA Shield
+		$ QA-Engine
 
 3) If something goes wrong, enable the built-in debugger.
 
-		$ export DEBUG=QA Shield*
-		$ QA Shield
+		$ export DEBUG=QA-Engine*
+		$ QA-Engine
 
 Now, the output is verbose and colour-coded to make your life easier.
 
 To turn off debugging, type:
 
 		$ export DEBUG=
-		$ QA Shield
+		$ QA-Engine
 
 I want to learn some vocabulary
 ===============================
 
-QA Shield ships with few default vocabularies - variables, files, web apis, web apps, etc. 
+QA-Engine ships with few default vocabularies - variables, files, web apis, web apps, etc. 
 
 To discover what phrases exist in the vocabularies, type:
 
-	$ QA Shield --knows
+	$ QA-Engine --knows
 
 Let's create a trivial example of a hypothetical test case.
 
@@ -147,11 +145,11 @@ The "WHEN ... " steps do useful work that result in desirable outcomes. For exam
 
 In this example, we simply write a debug message to the console, so let's turn on debug output.
 
-	$ export DEBUG=QA Shield*
+	$ export DEBUG=QA-Engine*
 
 You can adjust the logging scope - to see only Web API messages, use: 
 
-	$ export DEBUG=QA Shield:files
+	$ export DEBUG=QA-Engine:files
 
 The "THEN ..." steps make assertions, that is they test that conditions are met. For example, you can use arbitrary Javascript if necessary:
 
@@ -159,12 +157,12 @@ The "THEN ..." steps make assertions, that is they test that conditions are met.
 
 The "I succeed", "I pass" always meet their conditions. The inverse "I fail" forces the scenario to abort and report it's failure.
 
-I want to learn more about QA Shield
+I want to learn more about QA-Engine
 ============================================
 
 For runtime options, type:
 
-	$ QA Shield  -h
+	$ QA-Engine  -h
 
 For more information:
 
@@ -176,27 +174,27 @@ For more information:
 
 [Something Went Wrong](docs/errors.md). 
 
-[Web API Dialect](https://github.com/QA Shield-webapi/blob/master/vocab.md). 
+[Web API Dialect](https://github.com/QA-Engine-webapi/blob/master/vocab.md). 
 
-[Web API Advanced](https://github.com/QA Shield-webapi/blob/master/advanced.md). 
+[Web API Advanced](https://github.com/QA-Engine-webapi/blob/master/advanced.md). 
 
-[Web Browser Dialect](https://github.com/QA Shield-browser/blob/master/vocab.md). 
+[Web Browser Dialect](https://github.com/QA-Engine-browser/blob/master/vocab.md). 
 
-[Web Browser Advanced](https://github.com/QA Shield-browser/blob/master/advanced.md). 
+[Web Browser Advanced](https://github.com/QA-Engine-browser/blob/master/advanced.md). 
  
 I want to organise my work into folders
 =======================================
 
 If your features are in a different location then use the "--features" or "--epics" option to locate them. 
 
-	$ QA Shield --archive ./my-archive --features ./my-features
+	$ QA-Engine --archive ./my-archive --features ./my-features
 
 These folders are not automatically created, they return an error if they're not found.
 
 I want to re-use my features in other projects
 ==============================================
 
-QA Shield was designed to support a declarative style so that features are portable. 
+QA-Engine was designed to support a declarative style so that features are portable. 
 
 Supplying a different "config" file for each environment allows features to be re-used across multiple environments.
 
@@ -212,9 +210,9 @@ In this way, your BDD features are neatly abstracted from your runtime configura
 
 To specify a runtime configuration for your features, type:
 
-	$ QA Shield --config ./my-context.json
+	$ QA-Engine --config ./my-context.json
 
-By default, QA Shield will try to load a configuration file called "QA Shield.json" from your current directory. 
+By default, QA-Engine will try to load a configuration file called "QA-Engine.json" from your current directory. 
 
 If no file is found, then sensible default values are defined.
 
@@ -234,9 +232,9 @@ Any feature can contain a background, in which case the steps that carried out b
 I want to know how it works
 ===========================
 
-First, QA Shield parses the command line and initializes the Dialect, Features and Engine components.
+First, QA-Engine parses the command line and initializes the Dialect, Features and Engine components.
 
-Next it loads the default dialects. These can be specified on using the QA Shield_DIALECT environment variable. Dialects can also be
+Next it loads the default dialects. These can be specified on using the QA-Engine_DIALECT environment variable. Dialects can also be
 specified using --dialect option and within Feature: definitions using the @dialect annotation.
 
 Each Dialect instructs the parser (Yadda) to match a set of Gherkin phrases to their related function.
@@ -256,7 +254,7 @@ I want to add comments
 
 It's useful to document your intentions or to prevent a statement from running, for example during development.
 
-Simple, place a # before any line and it will be ignored by QA Shield.
+Simple, place a # before any line and it will be ignored by QA-Engine.
 
 	# This is ignored by the parser
 ```
@@ -282,24 +280,24 @@ I want to do run tests on a schedule
 
 Running a "cron job" is familar to DevOps teams who want to schedule regular activities.
 
-QA Shield-QA Shield has a built-in cron-like scheduler to provide continuous assurance, see [Cron Scheduler](docs/cron.md) for more details.
+QA-Engine-QA-Engine has a built-in cron-like scheduler to provide continuous assurance, see [Cron Scheduler](docs/cron.md) for more details.
 
 I want to automate everything
 =============================
 
-That is our goal too. We'll continue to address the needs of Enterprise QA Shields.
+That is our goal too. We'll continue to address the needs of Enterprise QA-Engines.
 
 Competent software engineers can easily create "blueprints" that capture the patterns, templates and files used to build SDLC artefacts.
 
-Then QA Shield can re-use those blueprints to build customised websites, portals, Apps, APIs, mock servers, micro services and more.
+Then QA-Engine can re-use those blueprints to build customised websites, portals, Apps, APIs, mock servers, micro services and more.
 
-Please share any custom Blueprints and Dialects so that QA Shield becomes more useful for all of us.
+Please share any custom Blueprints and Dialects so that QA-Engine becomes more useful for all of us.
 
-If you need support to build or debug your community Blueprints or Dialects, please ask@QA Shieldshield.com
+If you need support to build or debug your community Blueprints or Dialects, please ask@QA-Engineshield.com
 
 
 
-I want to license QA Shield
+I want to license QA-Engine
 ================================
 
 This software is licensed under the Apache 2 license, quoted below.

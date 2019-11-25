@@ -3,8 +3,8 @@ import * as assert from "assert";
 import * as yaml from "js-yaml";
 import { FeatureParser } from "yadda/lib/parsers";
 var csv2json = require("csvtojson").Converter;
-// var yaml = require("js-yaml");
 import * as fs from "fs";
+import { StepError } from "../results";
 
 export class Converters {
 
@@ -34,14 +34,26 @@ export class Converters {
         }
     }
 
+    public static load(raw: string, format: string, done: Function) {
+        switch(format.toLowerCase()) {
+            case "json":
+                return this.json(raw, done);
+            case "csv":
+                return this.json(raw, done);
+            case "text":
+                return this.text(raw, done);
+            case "yaml":
+                return this.yaml(raw, done);
+        }
+        throw new StepError("Unknown file format: "+format);
+    }
+
     static json(raw: string, done: Function) {
         done(null, JSON.parse(raw));
     }
 
     static text(raw: string, done: Function) {
-
         done(null, raw.toString());
-
     }
 
     static yaml(raw: string, done: Function) {
@@ -49,8 +61,8 @@ export class Converters {
     }
 
     static csv(raw: any, done: Function) {
-        var converter = new csv2json({});
-        converter.fromString(raw, function (err: any, result: any) {
+        var csv = new csv2json({});
+        csv.fromString(raw, function (err: any, result: any) {
             done(err, result);
         });
     }
