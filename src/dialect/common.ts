@@ -62,8 +62,8 @@ export class CommonDialect extends Dialect {
     }
 
 }
-//  var self = module.exports = function(meta4qa, learn, config, dialect) {
-// 	assert(meta4qa, "missing meta4qa");
+//  var self = module.exports = function(qa-engine, learn, config, dialect) {
+// 	assert(qa-engine, "missing qa-engine");
 //     assert(learn, "missing learn");
 //     assert(config, "missing config");
 //     assert(dialect, "missing dialect");

@@ -9,6 +9,7 @@ let jsonPath = require('JSONPath');
 let DOM = require('xmldom').DOMParser;
 let path = require('path');
 let files = require("./files");
+// let debug = require("debug")("qa:http");
 
 export class HTTP {
     static _cookies: any = {};
@@ -22,10 +23,8 @@ export class HTTP {
         return this._cookies[name] = this._cookies[name] ? this._cookies[name] : request.jar();
     }
 
-    static getClientAddress(req: any) {
-        assert(req, "Missing request");
-        assert(req.connection, "Missing connection");
-        return (req.headers['x-forwarded-for'] || '').split(',')[0] || req.connection.remoteAddress;
+    static getClientAddress(req: any): string {
+        return (req.headers['x-forwarded-for'] || '').split(',')[0] || req.connection?req.connection.remoteAddress:null;
     }
 
     static authorize(request: any, agent: any) {
@@ -38,8 +37,6 @@ export class HTTP {
     }
 
     static bearer(request: any, token: string) {
-        assert(request, "missing request");
-        assert(token, "missing token");
         return request.headers.Authorization = 'Bearer ' + token;
     }
 
@@ -93,8 +90,8 @@ export class HTTP {
         return url;
     }
 
-    static proxyURL(cmd: any, options: any) {
-        assert(cmd, "Missing HTTP command")
+    static proxyURL(oper: any, options: any) {
+        assert(oper, "Missing HTTP command")
         if (!options || !options.hostname) {
             return;
         }
@@ -107,48 +104,50 @@ export class HTTP {
 
         //(proxyCredentials?proxyCredentials+"@":"") +
         let proxyUrl = options.protocol + "://" + options.hostname + (options.port ? ":" + options.port : "");
-        cmd.proxy = proxyUrl;
+        oper.proxy = proxyUrl;
         options.url = options.proxyUrl;
 
         let token = 'Basic ' + new Buffer(proxyCredentials).toString('base64');
-        cmd.headers['Proxy-Authorization'] = token;
+        oper.headers['Proxy-Authorization'] = token;
     }
 
-    static command(method: string, resource: string, options: any, target: any) {
+    static operation(method: string, resource: string, options: any, target: any) {
         assert(method, "missing method");
         assert(resource, "missing resource");
         assert(options, "missing options");
 
-        options.url = this.url(resource, options, target);
-        let cmd = _.extend({
+        let oper = _.extend({
+            uri: this.url(resource, options, target),
             method: method,
-            jar: options.cookies || target.cookies,
+            jar: options.cookies || target.cookies || false,
             headers: {},
-            strictSSL: false,
+            strictSSL: true, // security posture
             followRedirect: false,
             qs: {}
         }, options);
 
-        this.proxyURL(cmd, _.extend({}, target.proxy, options.proxy));
+        this.proxyURL(oper, _.extend({}, target.proxy, options.proxy) ); // user options over-ride feature options as a security "feature"
 
-        return cmd;
+        return oper;
     }
 
-    static handleResponse(vars: any, done: Function) {
-        vars.stopwatch.start = _.now();
+    static handleResponse(options: any, done: Function) {
+        options.stopwatch.start = _.now();
+        // debug("handle-response: %o", options);
 
         return function (error: any, response: any) {
+			// debug("handled-response: %o --> %o", error, response);
             if (error || !response) {
-                // console.log("RESP error: %o", error);
+                // debug("RESP error: %o", error);
                 return done(new Error( error.message ));
             }
-            // console.log("RESP: %o --> %o", error, response?response.body:"NONE");
+            // debug("RESP: %o --> %o", error, response?response.body:"NONE");
 
-            vars.stopwatch.stop = _.now();
-            vars.stopwatch.duration = vars.stopwatch.stop - vars.stopwatch.start;
-            _.extend(vars.response, response);
-            if (error || vars.response.statusCode == 500) {
-                vars.error = error;
+            options.stopwatch.stop = _.now();
+            options.stopwatch.duration = options.stopwatch.stop - options.stopwatch.start;
+            _.extend(options.response, response);
+            if (error || options.response.statusCode == 500) {
+                options.error = error;
                 done(error, response);
                 return;
             }
@@ -156,11 +155,11 @@ export class HTTP {
             //, (response.body || "No Response Body")
             //debug("BODY: %j", self.response);
 
-            if (vars.request.json) {
+            if (options.request.json) {
                 //            self.response.body = JSON.parse(self.response.body);
             }
 
-            // console.log("http response: %o --> %o", vars, response?response.body:"NONE");
+            // debug("http response: %o --> %o", vars, response?response.body:"NONE");
             done(false, response);
         };
     }
@@ -190,7 +189,6 @@ export class HTTP {
 
         assert(cert.key, "Missing certificate key");
         assert(cert.cert, "Missing certificate");
-
 
         let certFile = path.join(rootDir, cert.cert);
         let certKeyFile = path.join(rootDir, cert.key);
@@ -258,12 +256,6 @@ export class HTTP {
             return new DOM().parseFromString(payload);
         }
     };
-
-    static detectFileType(file: string) {
-        let ix = file.lastIndexOf(".");
-        if (ix < 0) return "";
-        return file.substring(ix + 1).toLowerCase();
-    }
 
     static header(request: any, name: string, value: string) {
         request.headers[name] = value;

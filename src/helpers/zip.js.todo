@@ -1,7 +1,7 @@
 var assert = require("assert");
-var debug = require("../../node_modules/@types/debug")("meta4qa:zip");
+var debug = require("../../node_modules/@types/debug")("qa-engine:zip");
 var path = require("path");
-var meta4qa = require('./node_modules/meta4qa-core'), helps = meta4qa.helpers, files = helps.files, http = helps.http, _ = meta4qa._;
+var qa-engine = require('./node_modules/qa-engine-core'), helps = qa-engine.helpers, files = helps.files, http = helps.http, _ = qa-engine._;
 var AdmZip = require('./node_modules/adm-zip');
 
 var zips = helps.zip = module.exports;

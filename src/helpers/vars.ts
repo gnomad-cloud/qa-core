@@ -3,7 +3,7 @@ import { EventEmitter } from "events";
 let assert = require("assert");
 let jsonPath = require('JSONPath');
 let _ = require('lodash');
-// let debug = require("debug")("meta4qa:helps:vars");
+// let debug = require("debug")("qa-engine:helps:vars");
 let hbs = require('handlebars');
 let sha256 = require('js-sha256');
 

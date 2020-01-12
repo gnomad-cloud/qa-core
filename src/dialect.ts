@@ -27,7 +27,8 @@ export abstract class Dialect {
     }
 
     scope(_scope: FeatureScope) {
-        // to be extended
+        _.defaults(_scope, {
+        });
     }
 
     debug(message: string) {

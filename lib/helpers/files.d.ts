@@ -1,7 +1,7 @@
 export declare class Files {
     static FILE_ENCODING: string;
     static path(dir: string, file: string): any;
-    static root(paths: any, path: string, file?: string): any;
+    static root(paths: object, path: string, file?: string): any;
     static config(configFile: string | [], options: any): any;
     static load(file: string, options?: any): any;
     static stream(file: string, options?: any): any;
@@ -18,7 +18,6 @@ export declare class Files {
     static basename(file: string): string;
     static extension(path: string): string;
     static matches(path: string, filter: string): boolean;
-    static walk(from: string, _filter: string): Promise<string[]>;
     static find(from: string, filter: string, onFound: Function): any;
     static follow(path: string, onFound: Function, allDone?: Function): void;
     static exists(file: string): boolean;

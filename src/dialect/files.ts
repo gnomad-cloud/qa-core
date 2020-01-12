@@ -1,4 +1,4 @@
-import { Engine } from "../engine";
+import { Engine, FeatureScope } from "../engine";
 import { Dialect } from "../Dialect";
 import { Files } from "../helpers/files";
 import { Vars } from "../helpers/vars";
@@ -25,7 +25,7 @@ export class FilesDialect extends Dialect {
 		super(engine);
 
 		this.define(["I load $varname as $format from $file", "I read $varname as $format from $file"], function (this: any, name: string, format: string, filename: string, done: Function) {
-			let file = Files.root(engine.vars, filename);
+			let file = Files.root(this.paths, filename);
 			assert(Files.exists(file), format + " file not found: " + file);
 			// let converter = converts[format];
 			// assert(converter, format + " files are not supported: " + file);
@@ -41,17 +41,24 @@ export class FilesDialect extends Dialect {
 		});
 
 		this.define(["I mkdir $folder"], function (this: any, folder: string, done: Function) {
-			let path = Files.root(engine.paths, folder);
+			let path = Files.root(this.paths, folder);
 			mkdirp.sync(path);
 			done();
 		});
 
 	}
 
+    scope(_scope: FeatureScope) {
+		_.defaults(_scope, {
+			paths: {
+				files: "./files"
+			}
+		})
+    }
 }
 
-// let self = module.exports = function (meta4qa, learn, config, dialect) {
-// 	assert(meta4qa, "missing meta4qa");
+// let self = module.exports = function (qa-engine, learn, config, dialect) {
+// 	assert(qa-engine, "missing qa-engine");
 // 	assert(learn, "missing learn");
 // 	assert(config, "missing config");
 // 	assert(dialect, "missing dialect");

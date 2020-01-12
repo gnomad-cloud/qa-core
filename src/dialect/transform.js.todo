@@ -1,11 +1,11 @@
 var pkg = require("../../package");
 var assert = require('assert');
 var request = require('request');
-var meta4qa = require('meta4qa-core'), helps = meta4qa.helpers;
+var qa-engine = require('qa-engine-core'), helps = qa-engine.helpers;
 
-var debug = require('debug')('meta4qa:dialect:common');
-var log = require('debug')('meta4qa:log');
-var error = require('debug')('meta4qa:error');
+var debug = require('debug')('qa-engine:dialect:common');
+var log = require('debug')('qa-engine:log');
+var error = require('debug')('qa-engine:error');
 var child_process = require('child_process');
 
 /**
@@ -17,8 +17,8 @@ var child_process = require('child_process');
  *
  */
 
-var self = module.exports = function(meta4qa, learn, config, dialect) {
-	assert(meta4qa, "missing meta4qa");
+var self = module.exports = function(qa-engine, learn, config, dialect) {
+	assert(qa-engine, "missing qa-engine");
     assert(learn, "missing learn");
     assert(config, "missing config");
     assert(dialect, "missing dialect");

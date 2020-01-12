@@ -1,8 +1,8 @@
 /// <reference types="node" />
 import { Yadda, Library, Context } from "yadda";
 import { FeatureParser } from "yadda/lib/parsers";
-import { FeatureExport } from "yadda/lib/parsers/FeatureParser";
-import { ResultSet, StepError } from "./results";
+import { FeatureExport, ScenarioExport } from "yadda/lib/parsers/FeatureParser";
+import { ResultSet as TestResult, FeatureResult, ScenarioResult } from "./results";
 import { Dialect } from "./Dialect";
 import { EventEmitter } from "events";
 export declare class FeatureScope extends Context {
@@ -40,23 +40,40 @@ export declare class Engine {
      */
     scope(options: any): FeatureScope;
     /**
-       * Read files and execute a Gherkin Feature as string (set of scenarios/steps)
-       *
-       * @param feature
-    */
-    read(scope: FeatureScope, folder: string): Promise<ResultSet>;
+     * Read files and execute a Gherkin Feature as string (set of scenarios/steps)
+     *
+     * @param feature
+     */
+    read(scope: FeatureScope, folder: string): Promise<TestResult>;
     /**
      * Parse and execute a Gherkin Feature as string (set of scenarios/steps)
      *
      * @param feature
      */
-    run(feature: string, options?: any): Promise<ResultSet>;
+    run(feature: string, options?: any): Promise<TestResult>;
     /**
      * Execute a Gherkin Feature (scenarios/steps)
      *
      * @param scope
      * @param feature
      */
-    execute(scope: FeatureScope, featured: FeatureExport, _rs: ResultSet): Promise<ResultSet>;
-    toError(err: any): StepError;
+    execute(scope: FeatureScope, feature: FeatureExport, tests?: TestResult): Promise<TestResult>;
+    /**
+     * Execute a Gherkin Feature
+     *
+     * @param scope
+     * @param featured
+     * @param results
+     */
+    feature(scope: FeatureScope, featured: FeatureExport, results: TestResult): Promise<FeatureResult>;
+    /**
+     * Execute a Gherkin Scenario
+     *
+     * @param scope
+     * @param featured
+     * @param scenario
+     * @param feature_results
+     */
+    scenario(scope: FeatureScope, featured: FeatureExport, scenario: ScenarioExport, feature_results: FeatureResult): Promise<ScenarioResult>;
+    toError(err: any): string;
 }

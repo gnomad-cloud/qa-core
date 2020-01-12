@@ -1,11 +1,11 @@
-meta4qa
+qa-engine
 ==================
 
 Effective BDD is largely facilitated through the use of a simple domain-specific language (DSL) using English-like sentences.
 
 You can find out what phrases are understood using the --knows option. For example:
 
-	$ meta4qa --knows
+	$ qa-engine --knows
 
 Each statement describes a simple, atomic, action .
 

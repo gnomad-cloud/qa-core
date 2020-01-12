@@ -3,6 +3,7 @@ import { Dialect } from "../Dialect";
 import { Vars } from "../helpers/vars";
 import * as assert from "assert"
 import * as _ from "lodash";
+let debug = require("debug")("qa-engine:dialect:vars");
 
 /**
  * Variables
@@ -70,7 +71,7 @@ export class VarsDialect extends Dialect {
 			else if (value == "false") value = false;
 
 			Vars.set(this, name, value);
-			console.log("VARS: %o", this);
+			debug("set %o to %o", name, value);
 			done();
 		});
 
@@ -78,6 +79,7 @@ export class VarsDialect extends Dialect {
 			let value = Vars.find(this, var2);
 			assert(value != undefined, "Value " + name + " is undefined");
 			Vars.set(this, name, value);
+			debug("set %o to %o", name, value);
 			done();
 		});
 
@@ -89,7 +91,9 @@ export class VarsDialect extends Dialect {
 
 		this.define(["I convert $varname to text"], function (this: any, name: string, done: Function) {
 			let original = Vars.find(this, name);
-			Vars.set(this, name, JSON.stringify(original));
+			let value = JSON.stringify(original);
+			Vars.set(this, name, value);
+			debug("set %o to %o", name, value);
 			done();
 		});
 

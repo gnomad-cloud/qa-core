@@ -1,4 +1,4 @@
-import { Engine } from "../engine";
+import { Engine, FeatureScope } from "../engine";
 import { Dialect } from "../Dialect";
 /**
  * File System
@@ -12,4 +12,5 @@ export declare class FilesDialect extends Dialect {
     FILE_ENCODING: string;
     converts: any;
     constructor(engine: Engine);
+    scope(_scope: FeatureScope): void;
 }

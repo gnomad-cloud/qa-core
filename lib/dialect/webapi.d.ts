@@ -9,7 +9,8 @@ import { Dialect } from "../Dialect";
  *
  */
 export declare class WebAPIDialect extends Dialect {
-    VERBOSE: boolean;
+    protected engine: Engine;
     constructor(engine: Engine);
-    scope(scope: any): FeatureScope;
+    install(): void;
+    scope(scope: FeatureScope): FeatureScope;
 }

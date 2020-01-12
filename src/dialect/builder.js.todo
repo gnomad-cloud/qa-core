@@ -3,11 +3,11 @@ var assert = require('assert');
 var request = require('request');
 var fs = require('fs');
 var path = require('path');
-var debug = require('debug')('meta4qa:dialect:builder');
-var log = require('debug')('meta4qa:log');
-var error = require('debug')('meta4qa:error');
+var debug = require('debug')('qa-engine:dialect:builder');
+var log = require('debug')('qa-engine:log');
+var error = require('debug')('qa-engine:error');
 
-var meta4qa = require('meta4qa-core'), helps = meta4qa.helpers, files = helps.files, http = helps.http, _ = meta4qa._;
+var qa-engine = require('qa-engine-core'), helps = qa-engine.helpers, files = helps.files, http = helps.http, _ = qa-engine._;
 
 /**
  * Builder

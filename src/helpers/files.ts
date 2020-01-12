@@ -1,5 +1,4 @@
 import { converters } from "yadda";
-import { walker } from "./walker";
 
 let assert = require("assert");
 let fs = require("fs");
@@ -9,7 +8,7 @@ let mkdirp = require("mkdirp");
 let async = require("async");
 let yaml = require("js-yaml");
 
-let debug = require("debug")("meta4qa:helps:files");
+let debug = require("debug")("qa-engine:helps:files");
 // let converts = require('../converter');
 
 export class Files {
@@ -21,7 +20,7 @@ export class Files {
         return filename;
     }
 
-    static root(paths: any, path: string, file?: string) {
+    static root(paths: object, path: string, file?: string) {
         if (!file) {
             file = path;
             path = "files";
@@ -173,14 +172,14 @@ export class Files {
         return path.indexOf(filter)>=0;
     }
 
-    static walk(from: string, _filter: string): Promise<string[]> {
-        return new Promise<string[]>( (resolve, reject) => {
-            walker.walk(from, (err, results) => {
-                if (err) reject([ err.message ]);
-                else resolve(results);
-            });
-        });
-    }
+    // static walk(from: string, _filter: string): Promise<string[]> {
+    //     return new Promise<string[]>( (resolve, reject) => {
+    //         walker.walk(from, (err, results) => {
+    //             if (err) reject([ err.message ]);
+    //             else resolve(results);
+    //         });
+    //     });
+    // }
 
     static find(from: string, filter: string, onFound: Function) {
         if (!this.exists(from)) return {};

@@ -2,7 +2,7 @@ var pkg = require("../../package");
 var assert = require('assert');
 var debug = require('debug')("dialect:zip");
 var zips = require('../helpers/zip.js');
-var meta4qa = require('meta4qa-core'), helps = meta4qa.helpers, files = helps.files, http = helps.http, _ = meta4qa._;
+var qa-engine = require('qa-engine-core'), helps = qa-engine.helpers, files = helps.files, http = helps.http, _ = qa-engine._;
 
 /**
  * ZIP Tools
