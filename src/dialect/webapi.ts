@@ -824,18 +824,14 @@ export class WebAPIDialect extends Dialect {
          * @param {String} resource - target resource path or full URL
          */
 
-        this.define("I POST $resource", function(
+        this.define(["I POST $resource", "I POST to $resource"], function(
             this: any,
             resource: string,
             done: Function
         ) {
-            console.log("POST");
+            let self = this;
             this.request = HTTP.operation("POST", resource, this.request, this.target);
-            console.log("POSTING: %o", this.request);
-            request(this.request, (_err: any, _response: any, _body: any) => {
-                console.log("POSTED: ....");
-                HTTP.handleResponse(this, done);
-            });
+            request(this.request, HTTP.handleResponse(self, done) );
         });
 
         /**
