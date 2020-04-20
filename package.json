@@ -1,6 +1,6 @@
 {
   "name": "qa-engine",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "QA-Engine Library",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
