@@ -24,7 +24,7 @@ export abstract class Dialect {
     define(_pattern: string | string[] | RegExp | RegExp[], _fn: (...args:any[] )=>void, doc?: DialectDocs ): DialectDocs {
         this.engine.library.define(_pattern, _fn, this.engine.ctx);
 
-        let phrases = _.isArray(_pattern)?_pattern:[_pattern];
+        let phrases = _.isArray(_pattern)?_pattern:[_pattern.toString()];
 
         if (!doc) {
             let description = phrases[0].toString().replace("\n", "");
