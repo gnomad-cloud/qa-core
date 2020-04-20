@@ -90,7 +90,7 @@ export class WebAPIDialect extends Dialect {
         ) {
             this.request.requestCert = true;
             done();
-        });
+        }, _doc);
 
         _doc = this.define(["I don't require client certificates"], function(
             this: any,
@@ -98,59 +98,7 @@ export class WebAPIDialect extends Dialect {
         ) {
             this.request.requestCert = false;
             done();
-        });
-
-        /**
-         * Set an HTTP Header to a value
-         *
-         *      I set $header header to $value
-         *
-         *      I set header $header = $value
-         *
-         * @example
-         *
-         *      I set header Accept to application/json
-         *
-         * @method Set HTTP Request Header
-         * @param {String} name - header name
-         * @param {String} value - header value
-         */
-        _doc = this.define(
-            ["I set $header header to $value", "I set header $header = $value"],
-            function(this: any, name: string, value: string, done: Function) {
-                // debug("HTTP header %s => %s", name, value);
-                this.request.headers[name] = value;
-                debug("set header %o to %o", name, value);
-                done();
-            }
-        , new DialectDocs("webapi.headers", "HTTP headers"));
-
-        /**
-         * Set an HTTP Header from a variable
-         *
-         *      I set $header header from $varname
-         *
-         * @example
-         *
-         *      I set test = 123
-         *      I set header x-my-header from test
-         *
-         * @method Set HTTP Request Header
-         * @param {String} name - header name
-         * @param {String} varname - a scoped variable name
-         */
-        _doc = this.define(
-            [
-                "I set $header header from $varname",
-                "I set header $header from $varname"
-            ],
-            function(this: any, name: string, varname: string, done: Function) {
-                let value = Vars.find(this, varname);
-                // debug("HTTP header %s => (%s) %s", name, varname, value);
-                this.request.headers[name] = value;
-                debug("set header %o to %o from %s", name, value, varname);
-                done();
-            }, _doc);
+        }, _doc);
 
         /**
          * Add an HTTP Query Parameter to the Request
@@ -645,7 +593,7 @@ export class WebAPIDialect extends Dialect {
         ) {
             this.request.json = value;
             done();
-        }, _doc);
+        }, new DialectDocs("webapi.files", "Sending block of formatted text as data"));
 
         /**
          * Set HTTP response to JSON payload.
@@ -746,29 +694,6 @@ export class WebAPIDialect extends Dialect {
             done();
         }, _doc);
 
-        /**
-         * Issue an HTTP GET request to default target or an absolute URL.
-         * The @target annotation is used to select a target
-         *
-         *     I GET $resource
-         *
-         * @example
-         *
-         *     I GET /
-         *     I GET http://example.com
-         *
-         * @method Send HTTP GET request
-         * @param {String} resource - target resource path or full URL
-         */
-
-        _doc = this.define(["I GET $resource", "I GET from $resource"], function(
-            this: any,
-            resource: string,
-            done: Function
-        ) {
-            let cmd = HTTP.operation("GET", resource, this.request, this.target);
-           request(cmd, HTTP.handleResponse(this, done));
-        }, _doc);
 
         _doc = this.define(
             ["I GET JSON from $resource", "I GET JSON $resource"],
@@ -811,6 +736,30 @@ export class WebAPIDialect extends Dialect {
         }, _doc);
 
         /**
+         * Issue an HTTP GET request to default target or an absolute URL.
+         * The @target annotation is used to select a target
+         *
+         *     I GET $resource
+         *
+         * @example
+         *
+         *     I GET /
+         *     I GET http://example.com
+         *
+         * @method Send HTTP GET request
+         * @param {String} resource - target resource path or full URL
+         */
+
+        _doc = this.define(["I GET $resource", "I GET from $resource"], function(
+            this: any,
+            resource: string,
+            done: Function
+        ) {
+            let cmd = HTTP.operation("GET", resource, this.request, this.target);
+           request(cmd, HTTP.handleResponse(this, done));
+        } , new DialectDocs("webapi.operations", "Basic HTTP operations"));
+
+        /**
          * Issue an HTTP POST request to default target or an absolute URL.
          * The @target annotation is used to select a target
          *
@@ -833,7 +782,7 @@ export class WebAPIDialect extends Dialect {
             let self = this;
             this.request = HTTP.operation("POST", resource, this.request, this.target);
             request(this.request, HTTP.handleResponse(self, done) );
-        } , new DialectDocs("webapi.operations", "Basic HTTP operations"));
+        }, _doc);
 
         /**
          * Issue an HTTP PUT request to default target or an absolute URL.
@@ -1174,6 +1123,59 @@ export class WebAPIDialect extends Dialect {
             );
             done();
         }, _doc);
+
+
+        /**
+         * Set an HTTP Header to a value
+         *
+         *      I set $header header to $value
+         *
+         *      I set header $header = $value
+         *
+         * @example
+         *
+         *      I set header Accept to application/json
+         *
+         * @method Set HTTP Request Header
+         * @param {String} name - header name
+         * @param {String} value - header value
+         */
+        _doc = this.define(
+            ["I set $header header to $value", "I set header $header = $value"],
+            function(this: any, name: string, value: string, done: Function) {
+                // debug("HTTP header %s => %s", name, value);
+                this.request.headers[name] = value;
+                debug("set header %o to %o", name, value);
+                done();
+            }
+        , new DialectDocs("webapi.headers", "HTTP headers"));
+
+        /**
+         * Set an HTTP Header from a variable
+         *
+         *      I set $header header from $varname
+         *
+         * @example
+         *
+         *      I set test = 123
+         *      I set header x-my-header from test
+         *
+         * @method Set HTTP Request Header
+         * @param {String} name - header name
+         * @param {String} varname - a scoped variable name
+         */
+        _doc = this.define(
+            [
+                "I set $header header from $varname",
+                "I set header $header from $varname"
+            ],
+            function(this: any, name: string, varname: string, done: Function) {
+                let value = Vars.find(this, varname);
+                // debug("HTTP header %s => (%s) %s", name, varname, value);
+                this.request.headers[name] = value;
+                debug("set header %o to %o from %s", name, value, varname);
+                done();
+            }, _doc);
 
         _doc = this.define(/^response body should be valid (xml|json)$/, function(
             this: any,

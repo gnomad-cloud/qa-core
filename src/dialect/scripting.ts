@@ -1,5 +1,5 @@
 import { Engine } from "../engine";
-import { Dialect } from "../Dialect";
+import { Dialect, DialectDocs } from "../Dialect";
 import { Vars } from "../helpers/vars";
 
 var assert = require('assert');
@@ -32,12 +32,12 @@ export class ScriptingDialect extends Dialect {
 		 * @param {string} varname - variable name
 		 */
 
-		this.define("I return $javascript as $varname", function (this: any, js: string, name: string, done: Function) {
+		let doc = this.define("I return $javascript as $varname", function (this: any, js: string, name: string, done: Function) {
 			var fn = new Function("return (" + js + ");");
 			var result = fn.apply(self, arguments);
 			Vars.set(engine.vars, name, result);
 			done();
-		});
+		}, new DialectDocs("scripting.javascript", "Execute Javascript commands"));
 
 		/**
 		 * Execute Javascript - trigger a fail if return is falsey
@@ -57,7 +57,7 @@ export class ScriptingDialect extends Dialect {
 				assert(result, "Javascript return 'falsey'");
 			}
 			done();
-		});
+		}, doc);
 
 		/**
 		 * Assert some Javascript returns true or trigger a fail if return is 'falsey'
@@ -76,8 +76,9 @@ export class ScriptingDialect extends Dialect {
 			var result = fn.apply(this);
 			assert(result, "Javascript assert: " + js + " --> " + result);
 			done();
-		});
+		}, doc);
 
+		false && doc
 
 	}
 }
