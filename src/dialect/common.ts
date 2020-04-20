@@ -1,6 +1,7 @@
-import { Dialect } from "../Dialect";
+import { Dialect, DialectDocs } from "../Dialect";
 import { Engine } from "../engine";
 import { StepError } from "../results";
+import assert = require("assert");
 // import { StepError } from "../results";
 
 /**
@@ -17,24 +18,24 @@ export class CommonDialect extends Dialect {
     constructor(engine: Engine) {
         super(engine);
 
-        this.define(["I am $actor", "I am a $actor", "I am an $actor"], function (this: any, actor: string, done: Function) {
+        let doc = this.define(["I am $actor", "I am a $actor", "I am an $actor"], function (this: any, actor: string, done: Function) {
             this.name = actor;
             done();
-        });
+        }, new DialectDocs("common.actor", "Set the `name` variable"));
 
-        this.define(["I fail"], function (this: any, _done: Function) {
+        doc = this.define(["I fail"], function (this: any, _done: Function) {
             throw new StepError("Deliberate Fail", this);
-        });
+        }, new DialectDocs("common.fail", "Deliberately fail"));
 
         this.define(["I fail with $msg"], function (this: any, msg: string, _done: Function) {
             throw new StepError("Deliberate Fail: " + msg, this);
-        });
+        }, new DialectDocs("common.fail", "Deliberately fail - with custom error"));
 
-        this.define(["I pass", "I do nothing", "I succeed"], function (this: any, done: Function) {
+        doc = this.define(["I pass", "I do nothing", "I succeed"], function (this: any, done: Function) {
             done();
-        });
+        }, new DialectDocs("common.pass", "Do nothing / pass"));
 
-        this.define(["I wait $time $units", "I wait for $time $units"], function (this: any, time: number, units: string, done: Function) {
+        doc = this.define(["I wait $time $units", "I wait for $time $units"], function (this: any, time: number, units: string, done: Function) {
             var scale = 1000;
             switch (units) {
                 case "m":
@@ -57,8 +58,15 @@ export class CommonDialect extends Dialect {
             var wait = time * scale;
             console.log("waiting " + wait + " ms");
             done && setTimeout(done, wait);
-        });
+        }, new DialectDocs("common.wait", "Wait for period of time"));
 
+        doc = this.define( [ "elapsed time should be less than $elapsed", "duration should be less than $elapsed" ],
+        function(this: any, elapsed: number, done: Function) {
+            assert(this.stopwatch.duration < elapsed);
+            done();
+        }, new DialectDocs("common.stopwatch", "Check for elapsed time"));
+
+    false && doc
     }
 
 }
@@ -73,36 +81,36 @@ export class CommonDialect extends Dialect {
 //         return this.indexOf(element) > -1;
 //     };
 
-//     this.define(["I am $actor", "I am a $actor", "I am an $actor"], function(actor, done: Function) {
+//     doc = this.define(["I am $actor", "I am a $actor", "I am an $actor"], function(actor, done: Function) {
 //         assert(actor, "Missing $actor");
 //         debug("My name is "+actor);
 //         this.vars.name = actor;
 //         done();
 //     });
 
-//     this.define(["I want $outcome", "I want a $outcome", "I want an $outcome", "I want some $outcome", "I want to $outcome"], function(outcome, done: Function) {
+//     doc = this.define(["I want $outcome", "I want a $outcome", "I want an $outcome", "I want some $outcome", "I want to $outcome"], function(outcome, done: Function) {
 //         assert(outcome, "Missing $outcome");
 //         debug("We want "+outcome);
 //         this.vars.name = outcome;
 //         done();
 //     });
 
-//     this.define(["debug $msg"], function(msg, done: Function) {
+//     doc = this.define(["debug $msg"], function(msg, done: Function) {
 //         debug(msg);
 //         done();
 //     });
 
-//     this.define(["log $msg"], function(msg, done: Function) {
+//     doc = this.define(["log $msg"], function(msg, done: Function) {
 //         log(msg);
 //         done();
 //     });
 
-//     this.define(["error $msg"], function(msg, done: Function) {
+//     doc = this.define(["error $msg"], function(msg, done: Function) {
 //         error(msg);
 //         done();
 //     });
 
-//     this.define(["dump $varname", "I dump $varname"], function(name, done: Function) {
+//     doc = this.define(["dump $varname", "I dump $varname"], function(name, done: Function) {
 //         assert(name, "Missing $varname")
 //         debug("dump %s in current scope", name);
 //         var found = helps.vars.findNamed(this, name);
@@ -110,28 +118,28 @@ export class CommonDialect extends Dialect {
 //         done();
 //     });
 
-//     this.define(["dump", "I dump"], function(this: any, done: Function) {
+//     doc = this.define(["dump", "I dump"], function(this: any, done: Function) {
 //         debug("dump current scope");
 //         console.log("%j", this);
 //         done();
 //     });
 
-//     this.define(["I fail"], function(this: any, done: Function) {
+//     doc = this.define(["I fail"], function(this: any, done: Function) {
 //         debug("Deliberate OOPS !!");
 //         throw new Error("Deliberate Fail");
 //     });
 
-//     this.define(["I fail with $msg"], function(msg, done: Function) {
+//     doc = this.define(["I fail with $msg"], function(msg, done: Function) {
 //         debug("doh !! %s", msg);
 //         throw new Error("Deliberate Fail: "+msg);
 //     });
 
-//     this.define(["I pass", "I do nothing", "I succeed"], function(this: any, done: Function) {
+//     doc = this.define(["I pass", "I do nothing", "I succeed"], function(this: any, done: Function) {
 //         debug("Yay. '%s' was successful", this.feature);
 //         done();
 //     });
 
-//     this.define(["I wait $time $units", "I wait for $time $units"], function(time, units, done: Function) {
+//     doc = this.define(["I wait $time $units", "I wait for $time $units"], function(time, units, done: Function) {
 //         var scale = 1000;
 //         switch(units) {
 //             case "m":
@@ -156,7 +164,7 @@ export class CommonDialect extends Dialect {
 //         done && setTimeout(done, wait);
 //     });
 
-//     this.define(["I run $filename"], function(command, done: Function) {
+//     doc = this.define(["I run $filename"], function(command, done: Function) {
 //         var self = this;
 //         debug ("CLI Run %s from %s", command, process.cwd());
 //         child_process.execFile(command, {}, {
@@ -170,7 +178,7 @@ export class CommonDialect extends Dialect {
 //         })
 //     });
 
-//     this.define(["I exec $command"], function(command, done: Function) {
+//     doc = this.define(["I exec $command"], function(command, done: Function) {
 //         var self = this;
 //         debug ("CLI Exec: %s from %s", command, process.cwd());
 //         child_process.exec(command, {}, {

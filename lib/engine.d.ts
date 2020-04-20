@@ -3,7 +3,7 @@ import { Yadda, Library, Context } from "yadda";
 import { FeatureParser } from "yadda/lib/parsers";
 import { FeatureExport, ScenarioExport } from "yadda/lib/parsers/FeatureParser";
 import { ResultSet as TestResult, FeatureResult, ScenarioResult } from "./results";
-import { Dialect } from "./Dialect";
+import { Dialect, DialectDocs } from "./Dialect";
 import { EventEmitter } from "events";
 export declare class FeatureScope extends Context {
     constructor(defaults?: any);
@@ -75,5 +75,6 @@ export declare class Engine {
      * @param feature_results
      */
     scenario(scope: FeatureScope, featured: FeatureExport, scenario: ScenarioExport, feature_results: FeatureResult): Promise<ScenarioResult>;
+    getDocs(): DialectDocs[];
     toError(err: any): string;
 }

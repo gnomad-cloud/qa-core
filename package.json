@@ -37,7 +37,7 @@
     "mkdirp": "^0.5.1",
     "nodemon": "^1.19.3",
     "path": "^0.12.7",
-    "request": "^2.88.0",
+    "request": "^2.88.2",
     "speakeasy": "^2.0.0",
     "xmldom": "^0.1.27",
     "yadda": "^2.1.0"

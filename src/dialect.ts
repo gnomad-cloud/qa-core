@@ -3,10 +3,16 @@ import * as _ from "lodash";
 import * as uuidv5 from "uuid/v5";
 
 export class DialectDocs {
+    public tag: string
+    public description: string = "unknown"
+    public phrases: any[]
 
-    constructor(protected id: string, protected description: string, public phrases?:any ) {
-
+    constructor(_tag: string, _description: string, _phrases?:any ) {
+        this.tag = _tag || "unknown";
+        this.description = _description || "unknown";
+        this.phrases = _phrases || [];
     }
+
 }
 export abstract class Dialect {
     docs: DialectDocs[] = [];
@@ -15,15 +21,19 @@ export abstract class Dialect {
         this.engine.addDialect(this);
     }
 
-    define(_pattern: string | string[] | RegExp | RegExp[], _fn: (...args:any[] )=>void, doc?: DialectDocs ) {
+    define(_pattern: string | string[] | RegExp | RegExp[], _fn: (...args:any[] )=>void, doc?: DialectDocs ): DialectDocs {
         this.engine.library.define(_pattern, _fn, this.engine.ctx);
 
-        
-        if (!doc) doc = new DialectDocs( uuidv5(_pattern.toString(),uuidv5.DNS), _pattern.toString() );
+        let phrases = _.isArray(_pattern)?_pattern:[_pattern];
 
-        doc.phrases = _.isArray(_pattern)?_pattern:[_pattern];
-
-        this.docs.push( doc );
+        if (!doc) {
+            let description = phrases[0].toString().replace("\n", "");
+            if (description.startsWith("I ")) description = description.substring(2).toUpperCase()
+            doc = new DialectDocs( uuidv5(phrases[0].toString(),uuidv5.DNS), description );
+        }
+        if (this.docs.indexOf(doc)<0) this.docs.push( doc );
+        doc.phrases = doc.phrases.concat(phrases)
+        return doc
     }
 
     scope(_scope: FeatureScope) {

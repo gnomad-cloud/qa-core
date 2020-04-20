@@ -1,4 +1,4 @@
-import { Dialect } from "../Dialect";
+import { Dialect, DialectDocs } from "../Dialect";
 import { Engine } from "../engine";
 import { TCP } from "../helpers/tcp";
 import * as _ from "lodash";
@@ -22,7 +22,7 @@ export class X509Dialect extends Dialect {
 
         // ***** WHEN *****
 
-        this.define(["I get a server certificate", "I get an SNI server certificate", "I get a server certificate using SNI"], function (this: any, done: Function) {
+        let doc = this.define(["I get a server certificate", "I get an SNI server certificate", "I get a server certificate using SNI"], function (this: any, done: Function) {
             assert(this.peer, "scope not initialised");
             assert(this.target, "Missing an HTTP target");
             var hostname = this.target.hostname;
@@ -36,7 +36,7 @@ export class X509Dialect extends Dialect {
                 _.extend(self.peer, peer);
                 done && done();
             })
-        });
+        }, new DialectDocs("certs.server", "X.509 server certificates"));
 
         this.define(["I get $target server certificate", "I get $target SNI certificate"], function (this: any, $target, done: Function) {
             assert(this.peer, "scope not initialised");
@@ -55,7 +55,7 @@ export class X509Dialect extends Dialect {
                 _.extend(self.peer, peer);
                 done && done();
             })
-        });
+        },doc);
 
 
         this.define(["I trust $host", "I get a server certificate from $host", "I get SNI certificate from $host"], function (this: any, hostname, done: Function) {
@@ -70,7 +70,7 @@ export class X509Dialect extends Dialect {
                 _.extend(self.peer, peer);
                 done && done();
             })
-        });
+        }, doc);
 
         this.define(["I get a server certificate without SNI"], function (this: any, done: Function) {
             assert(this.peer, "scope not initialised");
@@ -87,7 +87,7 @@ export class X509Dialect extends Dialect {
                 done && done();
             })
 
-        });
+        }, doc );
 
 
         // ***** THEN *****
@@ -96,7 +96,7 @@ export class X509Dialect extends Dialect {
             assert(this.peer, "server cert missing");
             assert(this.peer.authorized, "Server cert not authorized");
             done && done();
-        });
+        }, doc);
 
         this.define(["server certificate $varname must match $pattern", "$varname in server certificate must match $pattern"], function (this: any, name, pattern, done: Function) {
             assert(this.peer, "server cert missing");
@@ -106,6 +106,8 @@ export class X509Dialect extends Dialect {
             var regexp = new RegExp(pattern);
             assert(regexp.test(found), "Pattern /" + pattern + "/ not found");
             done && done();
-        });
+        }, doc);
+
+        false && doc;
     }
 }

@@ -1,5 +1,5 @@
 import { Engine, FeatureScope } from "../engine";
-import { Dialect } from "../Dialect";
+import { Dialect, DialectDocs } from "../Dialect";
 import { WebAPI } from "../helpers/webapi";
 import { HTTP } from "../helpers/http";
 import { Vars } from "../helpers/vars";
@@ -29,6 +29,7 @@ export class WebAPIDialect extends Dialect {
     }
 
     install() {
+        let _doc = null;
         /**
          * Add a client certificate to an HTTP request.
          * The certificate itself is defined in the config.json file.
@@ -44,7 +45,7 @@ export class WebAPIDialect extends Dialect {
          * @method Use Client Certificate
          * @param {String} cert - certificate name
          */
-        this.define(
+        _doc = this.define(
             [
                 "I use a $CERT client certificate",
                 "I use an $CERT client certificate"
@@ -65,7 +66,39 @@ export class WebAPIDialect extends Dialect {
                 debug("using client-certificate from %s", cert_dir);
                 done();
             }
-        );
+        , new DialectDocs("webapi.certs", "TLS X.509 Certificates"));
+
+        _doc = this.define(["I enable strict SSL", "I enable strict TLS"], function(
+            this: any,
+            done: Function
+        ) {
+            this.request.strictSSL = true;
+            done();
+        }, _doc);
+
+        _doc = this.define(["I disable strict SSL", "I disable strict TLS"], function(
+            this: any,
+            done: Function
+        ) {
+            this.request.strictSSL = false;
+            done();
+        }, _doc);
+
+        _doc = this.define(["I require client certificates"], function(
+            this: any,
+            done: Function
+        ) {
+            this.request.requestCert = true;
+            done();
+        });
+
+        _doc = this.define(["I don't require client certificates"], function(
+            this: any,
+            done: Function
+        ) {
+            this.request.requestCert = false;
+            done();
+        });
 
         /**
          * Set an HTTP Header to a value
@@ -82,7 +115,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} name - header name
          * @param {String} value - header value
          */
-        this.define(
+        _doc = this.define(
             ["I set $header header to $value", "I set header $header = $value"],
             function(this: any, name: string, value: string, done: Function) {
                 // debug("HTTP header %s => %s", name, value);
@@ -90,7 +123,7 @@ export class WebAPIDialect extends Dialect {
                 debug("set header %o to %o", name, value);
                 done();
             }
-        );
+        , new DialectDocs("webapi.headers", "HTTP headers"));
 
         /**
          * Set an HTTP Header from a variable
@@ -106,7 +139,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} name - header name
          * @param {String} varname - a scoped variable name
          */
-        this.define(
+        _doc = this.define(
             [
                 "I set $header header from $varname",
                 "I set header $header from $varname"
@@ -117,8 +150,7 @@ export class WebAPIDialect extends Dialect {
                 this.request.headers[name] = value;
                 debug("set header %o to %o from %s", name, value, varname);
                 done();
-            }
-        );
+            }, _doc);
 
         /**
          * Add an HTTP Query Parameter to the Request
@@ -140,7 +172,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} value - query parameter value
          */
 
-        this.define(
+        _doc = this.define(
             [
                 "I set parameter $key to $value",
                 "I set $key parameter to $value",
@@ -152,9 +184,9 @@ export class WebAPIDialect extends Dialect {
                 debug("set query string %o to %o", name, value);
                 done();
             }
-        );
+        , new DialectDocs("webapi.params", "HTTP query parameter"));
 
-        this.define(
+        _doc = this.define(
             [
                 "I set parameter $key from $varname",
                 "I set $key parameter from $varname",
@@ -171,14 +203,13 @@ export class WebAPIDialect extends Dialect {
                     varname
                 );
                 done();
-            }
-        );
+            } ,_doc);
 
         // this.define(/^I set headers to$/, function (this: any, args: any[], done: Function) {
         // 	done();
         // });
 
-        this.define(
+        _doc = this.define(
             ["I use basic authentication", "I login", "I authenticate"],
             function(this: any, done: Function) {
                 assert(this.agent, "Missing user agent - refer to config JSON");
@@ -187,9 +218,9 @@ export class WebAPIDialect extends Dialect {
                 // debug("authorised: %s -> %s", this.agent.username, this.request.headers.Authorization);
                 done();
             }
-        );
+        , new DialectDocs("webapi.auth", "HTTP Basic Authentication"));
 
-        this.define(
+        _doc = this.define(
             ["I use basic authentication as $agent", "I login as $agent"],
             function(this: any, agent: string, done: Function) {
                 assert(
@@ -201,8 +232,7 @@ export class WebAPIDialect extends Dialect {
 
                 HTTP.authorize(this.request, credentials);
                 done();
-            }
-        );
+            }, _doc);
 
         /**
          * Use OAUTH flow to authenticate using default agent
@@ -218,7 +248,7 @@ export class WebAPIDialect extends Dialect {
          *
          */
 
-        this.define(
+        _doc = this.define(
             [
                 "I use OAuth2",
                 "I use oauth",
@@ -253,7 +283,7 @@ export class WebAPIDialect extends Dialect {
                     });
                 }
             }
-        );
+        , new DialectDocs("webapi.auth", "HTTP OAuth2 Authentication"));
 
         /**
          * Use OAUTH flow to authenticate using a named agent
@@ -272,7 +302,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} agent - named agent
          */
 
-        this.define(
+        _doc = this.define(
             [
                 "I use OAuth2 credentials as $agent",
                 "I use oauth credentials as $agent",
@@ -289,10 +319,9 @@ export class WebAPIDialect extends Dialect {
                     HTTP.bearer(scope.request, scope.agent.access_token);
                     done(err, json);
                 });
-            }
-        );
+            }, _doc);
 
-        this.define(
+        _doc = this.define(
             [
                 "I set oauth token from $var",
                 "I set oauth access_token from $var"
@@ -307,8 +336,7 @@ export class WebAPIDialect extends Dialect {
                 this.agent.oauth = this.agent.oauth || {};
                 Vars.set(this.agent.oauth, "access_token", token);
                 done();
-            }
-        );
+            }, _doc);
 
         /**
          * Set a named HTTP cookie to value
@@ -326,14 +354,23 @@ export class WebAPIDialect extends Dialect {
          * @param {String} value - cookie value
          */
 
-        this.define(
+        _doc = this.define(
             ["I set cookie $cookie to $value", "I set cookie $cookie = $value"],
             function(this: any, name: string, value: string, done: Function) {
                 this.request.jar = this.cookies;
                 this.request.cookie(name + "=" + value);
                 done();
             }
-        );
+        , new DialectDocs("webapi.cookies", "HTTP cookies"));
+
+        _doc = this.define("cookie $cookie should exist", function(
+            this: any,
+            _cookie: string,
+            done: Function
+        ) {
+            this.request.jar = HTTP.cookies();
+            done();
+        }, _doc);
 
         /**
          * Set a named HTTP timeout to a time in milliseconds
@@ -348,14 +385,11 @@ export class WebAPIDialect extends Dialect {
          * @param {String} timeout - duration in milliseconds
          */
 
-        this.define(["I set request timeout to $time"], function(
-            this: any,
-            timeInMillis: number,
-            done: Function
-        ) {
+        _doc = this.define(["I set request timeout to $time"], 
+        function(this: any, timeInMillis: number, done: Function ) {
             this.request.timeout = timeInMillis ? timeInMillis : 10000;
             done();
-        });
+        }, new DialectDocs("webapi.options", "HTTP options"));
 
         /**
          * Enable HTTP keep-alive
@@ -369,13 +403,13 @@ export class WebAPIDialect extends Dialect {
          * @method Enable HTTP keep alive
          */
 
-        this.define(["I enable keep alive"], function(
+        _doc = this.define(["I enable keep alive"], function(
             this: any,
             done: Function
         ) {
             this.request.forever = true;
             done();
-        });
+        }, _doc);
 
         /**
          * Disable HTTP keep-alive
@@ -389,13 +423,13 @@ export class WebAPIDialect extends Dialect {
          * @method Disable HTTP keep alive
          */
 
-        this.define(["I disable keep alive"], function(
+        _doc = this.define(["I disable keep alive"], function(
             this: any,
             done: Function
         ) {
             this.request.forever = false;
             done();
-        });
+        }, _doc);
 
         /**
          * Enable HTTP GZIP compression
@@ -409,10 +443,10 @@ export class WebAPIDialect extends Dialect {
          * @method Enable HTTP GZIP compression
          */
 
-        this.define(["I enable gzip"], function(this: any, done: Function) {
+        _doc = this.define(["I enable gzip"], function(this: any, done: Function) {
             this.request.gzip = true;
             done();
-        });
+        }, _doc);
 
         /**
          * Disable HTTP GZIP compression
@@ -426,76 +460,44 @@ export class WebAPIDialect extends Dialect {
          * @method Disable HTTP GZIP compression
          */
 
-        this.define(["I disable gzip"], function(this: any, done: Function) {
+        _doc = this.define(["I disable gzip"], function(this: any, done: Function) {
             this.request.gzip = false;
             done();
-        });
+        }, _doc);
 
-        this.define(["I set encoding to $encoding"], function(
+        _doc = this.define(["I set encoding to $encoding"], function(
             this: any,
             encoding: string,
             done: Function
         ) {
             this.request.encoding = encoding ? encoding : "utf8";
             done();
-        });
+        }, _doc);
 
-        this.define(["I enable redirects"], function(
+        _doc = this.define(["I enable redirects"], function(
             this: any,
             done: Function
         ) {
             this.request.followRedirect = true;
             done();
-        });
+        }, _doc);
 
-        this.define(["I disable redirects"], function(
+        _doc = this.define(["I disable redirects"], function(
             this: any,
             done: Function
         ) {
             this.request.followRedirect = false;
             done();
-        });
+        }, _doc);
 
-        this.define(["I enable strict SSL"], function(
-            this: any,
-            done: Function
-        ) {
-            this.request.strictSSL = true;
-            done();
-        });
-
-        this.define(["I disable strict SSL"], function(
-            this: any,
-            done: Function
-        ) {
-            this.request.strictSSL = false;
-            done();
-        });
-
-        this.define(["I require client certificates"], function(
-            this: any,
-            done: Function
-        ) {
-            this.request.requestCert = true;
-            done();
-        });
-
-        this.define(["I don't require client certificates"], function(
-            this: any,
-            done: Function
-        ) {
-            this.request.requestCert = false;
-            done();
-        });
-
-        this.define(["I request JSON"], function(this: any, done: Function) {
+        _doc = this.define(["I request JSON"], function(this: any, done: Function) {
             this.request.headers["Content-Type"] =
                 this.request.headers["Content-Type"] || "application/json";
             this.request.json = true;
             done();
-        });
+        }, _doc);
 
-        this.define(["I upload $file"], function(
+        _doc = this.define(["I upload $file"], function(
             this: any,
             file: string,
             done: Function
@@ -504,9 +506,9 @@ export class WebAPIDialect extends Dialect {
 
             HTTP.header(this.request, "Content-Type", WebAPI.EXT_TO_MIME.json);
             WebAPI.uploadFormFile(this.request, filename, done);
-        });
+        }, new DialectDocs("webapi.files", "File upload/downlload"));
 
-        this.define(
+        _doc = this.define(
             [
                 "I send $file as body",
                 "I upload $file as body",
@@ -517,7 +519,7 @@ export class WebAPIDialect extends Dialect {
                 debug("upload %o via %o", file, this.request);
                 WebAPI.uploadFile(this.request, file, done);
             }
-        );
+        , _doc);
 
         /**
          * Set HTTP response to payload. Objects are sent as JSON, everything else as BODY text.
@@ -532,7 +534,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} payload - JSON or text payload
          */
 
-        this.define(["I set body to $payload"], function(
+        _doc = this.define(["I set body to $payload"], function(
             this: any,
             value: string,
             done: Function
@@ -545,7 +547,7 @@ export class WebAPIDialect extends Dialect {
                 // debug("set HTTP json body: %j ", value);
             }
             done();
-        });
+        }, new DialectDocs("webapi.files", "Sending data, forms and files"));
 
         /**
          * Set HTTP response to payload. Objects are sent as JSON, everything else as BODY text.
@@ -560,7 +562,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} varname - name of variable containing body
          */
 
-        this.define(["I set body from $varname"], function(
+        _doc = this.define(["I set body from $varname"], function(
             this: any,
             name: string,
             done: Function
@@ -574,7 +576,7 @@ export class WebAPIDialect extends Dialect {
                 this.request.json = value;
             }
             done();
-        });
+        }, _doc);
 
         /**
          * Set HTTP response to payload. Objects are sent as JSON, everything else as BODY text.
@@ -589,7 +591,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} varname - name of variable containing body
          */
 
-        this.define(["I set text body from $varname"], function(
+        _doc = this.define(["I set text body from $varname"], function(
             this: any,
             name: string,
             done: Function
@@ -599,9 +601,9 @@ export class WebAPIDialect extends Dialect {
             this.request.body = JSON.stringify(value);
             // debug("set HTTP text body: %j ", value);
             done();
-        });
+        }, _doc);
 
-        this.define(["I set form $name to $value"], function(
+        _doc = this.define(["I set form $name to $value"], function(
             this: any,
             name: string,
             value: string,
@@ -609,7 +611,7 @@ export class WebAPIDialect extends Dialect {
         ) {
             WebAPI.setFormField(this, name, value);
             done();
-        });
+        }, _doc);
 
         /**
          * Set HTTP response to CSV payload.
@@ -636,14 +638,14 @@ export class WebAPIDialect extends Dialect {
          * @param {String} payload - JSON or text payload
          */
 
-        this.define(["I set body to CSV:\n$CSV", "I send CSV:\n$CSV"], function(
+        _doc = this.define(["I set body to CSV:\n$CSV", "I send CSV:\n$CSV"], function(
             this: any,
             value: string,
             done: Function
         ) {
             this.request.json = value;
             done();
-        });
+        }, _doc);
 
         /**
          * Set HTTP response to JSON payload.
@@ -669,14 +671,13 @@ export class WebAPIDialect extends Dialect {
          * @param {String} payload - JSON or text payload
          */
 
-        this.define(
+        _doc = this.define(
             ["I set body to JSON:\n$JSON", "I send JSON:\n$JSON"],
             function(this: any, value: string, done: Function) {
                 assert(this.request, "Missing HTTP request");
                 this.request.json = value;
                 done();
-            }
-        );
+        }, _doc);
 
         /**
          * Set HTTP response to JSON payload.
@@ -702,7 +703,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} payload - JSON or text payload
          */
 
-        this.define(["I set body to XML:\n$XML", "I send XML:\n$XML"], function(
+        _doc = this.define(["I set body to XML:\n$XML", "I send XML:\n$XML"], function(
             this: any,
             value: string,
             done: Function
@@ -710,7 +711,7 @@ export class WebAPIDialect extends Dialect {
             HTTP.header(this.request, "Content-Type", WebAPI.EXT_TO_MIME.xml);
             this.request.body = value;
             done();
-        });
+        }, _doc);
 
         /**
          * Set HTTP response to raw (text) payload.
@@ -736,14 +737,14 @@ export class WebAPIDialect extends Dialect {
          * @param {String} text payload
          */
 
-        this.define(["I set body to:\n$TEXT", "I send:\n$TEXT"], function(
+        _doc = this.define(["I set body to:\n$TEXT", "I send:\n$TEXT"], function(
             this: any,
             value: string,
             done: Function
         ) {
             this.request.body = value;
             done();
-        });
+        }, _doc);
 
         /**
          * Issue an HTTP GET request to default target or an absolute URL.
@@ -760,16 +761,16 @@ export class WebAPIDialect extends Dialect {
          * @param {String} resource - target resource path or full URL
          */
 
-        this.define(["I GET $resource", "I GET from $resource"], function(
+        _doc = this.define(["I GET $resource", "I GET from $resource"], function(
             this: any,
             resource: string,
             done: Function
         ) {
             let cmd = HTTP.operation("GET", resource, this.request, this.target);
            request(cmd, HTTP.handleResponse(this, done));
-        });
+        }, _doc);
 
-        this.define(
+        _doc = this.define(
             ["I GET JSON from $resource", "I GET JSON $resource"],
             function(this: any, resource: string, done: Function) {
                 let cmd = HTTP.operation(
@@ -781,9 +782,9 @@ export class WebAPIDialect extends Dialect {
                 cmd.json = true;
                 request(cmd, HTTP.handleResponse(this, done));
             }
-        );
+        , new DialectDocs("webapi.download", "Downloading data and files"));
 
-        this.define(["I download $resource to $path $file"], function(
+        _doc = this.define(["I download $resource to $path $file"], function(
             this: any,
             resource: string,
             _path: string,
@@ -807,7 +808,7 @@ export class WebAPIDialect extends Dialect {
                 .on("close", function() {
                     done();
                 });
-        });
+        }, _doc);
 
         /**
          * Issue an HTTP POST request to default target or an absolute URL.
@@ -824,7 +825,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} resource - target resource path or full URL
          */
 
-        this.define(["I POST $resource", "I POST to $resource"], function(
+        _doc = this.define(["I POST $resource", "I POST to $resource"], function(
             this: any,
             resource: string,
             done: Function
@@ -832,7 +833,7 @@ export class WebAPIDialect extends Dialect {
             let self = this;
             this.request = HTTP.operation("POST", resource, this.request, this.target);
             request(this.request, HTTP.handleResponse(self, done) );
-        });
+        } , new DialectDocs("webapi.operations", "Basic HTTP operations"));
 
         /**
          * Issue an HTTP PUT request to default target or an absolute URL.
@@ -849,14 +850,14 @@ export class WebAPIDialect extends Dialect {
          * @param {String} resource - target resource path or full URL
          */
 
-        this.define("I PUT $resource", function(
+        _doc = this.define("I PUT $resource", function(
             this: any,
             resource: string,
             done: Function
         ) {
             let cmd = HTTP.operation("PUT", resource, this.request, this.target);
             request(cmd, HTTP.handleResponse(this, done));
-        });
+        }, _doc);
 
         /**
          * Issue an HTTP DELETE request to default target or an absolute URL.
@@ -873,7 +874,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} resource - target resource path or full URL
          */
 
-        this.define("I DELETE $resource", function(
+        _doc = this.define("I DELETE $resource", function(
             this: any,
             resource: string,
             done: Function
@@ -885,7 +886,7 @@ export class WebAPIDialect extends Dialect {
                 this.target
             );
             request(cmd, HTTP.handleResponse(this, done));
-        });
+        }, _doc);
 
         //this.define("I $verb $resource", function(verb, resource, done: Function) {
         //    let cmd = HTTP.command(verb.toUpperCase(), resource, this.request, this.target );
@@ -906,7 +907,7 @@ export class WebAPIDialect extends Dialect {
          * @method Send HTTP PATCH request
          * @param {String} resource - target resource path or full URL
          */
-        this.define("I PATCH $resource", function(
+        _doc = this.define("I PATCH $resource", function(
             this: any,
             resource: string,
             done: Function
@@ -918,7 +919,7 @@ export class WebAPIDialect extends Dialect {
                 this.target
             );
             request(cmd, HTTP.handleResponse(this, done));
-        });
+        }, _doc);
 
         /**
          * Issue an HTTP HEAD request to default target or an absolute URL.
@@ -935,14 +936,14 @@ export class WebAPIDialect extends Dialect {
          * @param {String} resource - target resource path or full URL
          */
 
-        this.define("I request HEAD for $resource", function(
+        _doc = this.define("I request HEAD for $resource", function(
             this: any,
             resource: string,
             done: Function
         ) {
             let cmd = HTTP.operation("HEAD", resource, this.request, this.target);
             request(cmd, HTTP.handleResponse(this, done));
-        });
+        }, _doc);
 
         /**
          * Issue an HTTP POST request to default target or an absolute URL.
@@ -959,7 +960,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} resource - target resource path or full URL
          */
 
-        this.define("I request OPTIONS for $resource", function(
+        _doc = this.define("I request OPTIONS for $resource", function(
             this: any,
             resource: string,
             done: Function
@@ -971,7 +972,7 @@ export class WebAPIDialect extends Dialect {
                 this.target
             );
             request(cmd, HTTP.handleResponse(this, done));
-        });
+        }, _doc);
 
         /**
          * Set an OAUTH access_token both as scoped variable for use in subsequent requests.
@@ -987,19 +988,12 @@ export class WebAPIDialect extends Dialect {
          * @param {String} token - valid oauth access token
          */
 
-        this.define("I store body path $path as access token", function(
-            this: any,
-            path: string,
-            done: Function
-        ) {
+        _doc = this.define("I store body path $path as access token", function(this: any, path: string, done: Function) {
             let access_token = HTTP.findInPath(this.response.body, path);
-            assert(
-                access_token,
-                "Body path " + path + " does not contains an access_token"
-            );
+            assert( access_token, "Body path " + path + " does not contains an access_token");
             this.access_token = access_token;
             done();
-        });
+        }, new DialectDocs("webapi.vars", "Extract variables from body"));
 
         /**
          * Extra a value from the (JSON) body and store as a scoped variable
@@ -1015,7 +1009,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} name - scoped variable to store result
          */
 
-        this.define("I store body path $path as $name", function(
+        _doc = this.define("I store body path $path as $name", function(
             this: any,
             path: string,
             name: string,
@@ -1025,7 +1019,7 @@ export class WebAPIDialect extends Dialect {
             assert(value, "Value for " + path + " is empty");
             Vars.set(this, name, value);
             done();
-        });
+        }, _doc);
 
         /**
          * Extract avalue from HTTP header and store as a scoped variable
@@ -1041,7 +1035,7 @@ export class WebAPIDialect extends Dialect {
          * @param {String} name - scoped variable to store result
          */
 
-        this.define("I store header $header as $name", function(
+        _doc = this.define("I store header $header as $name", function(
             this: any,
             header: string,
             name: string,
@@ -1050,61 +1044,18 @@ export class WebAPIDialect extends Dialect {
             header = header.toLowerCase();
             this[name] = this.response.headers[header];
             done();
-        });
+        }, _doc);
 
-        this.define(
+        _doc = this.define(
             ["I parse body as JSON", "I convert body to JSON"],
             function(this: any, done: Function) {
                 this.response.body = JSON.parse(this.response.body);
                 done();
             }
-        );
+        , _doc);
 
-        /**
-         * Generate a TOTP token based on the shared secret and current time.
-         *
-         * @example
-         *
-         *     I use totp
-         *
-         */
 
-        this.define("I use totp", function(this: any, done: Function) {
-            let agent = this.agent;
-            assert(agent.totp, "Missing agent.totp");
-            assert(agent.totp.secret, "Missing agent.totp.secret");
-
-            agent.totp.token = speakeasy.totp({
-                secret: agent.totp.secret,
-                encoding: agent.totp.encoding || "base32",
-                step: agent.totp.step || 60
-            });
-
-            done();
-        });
-
-        this.define("I use totp as $actor", function(
-            this: any,
-            actor: string,
-            done: Function
-        ) {
-            assert(this.agents, "Missing agents");
-            assert(this.agents[actor], "Missing agent " + actor);
-
-            let agent: any = this.agents[actor];
-
-            agent.totp.token = speakeasy.totp({
-                secret: agent.totp.secret,
-                encoding: agent.totp.encoding || "base32",
-                step: agent.totp.step || 60
-            });
-
-            done();
-        });
-
-        // ******** define ********
-
-        this.define("response code should be $code", function(
+        _doc = this.define("response code should be $code", function(
             this: any,
             resp_code: string,
             done: Function
@@ -1122,9 +1073,9 @@ export class WebAPIDialect extends Dialect {
                 "Status code is " + this.response.statusCode + " not " + codes
             );
             done();
-        });
+        }, new DialectDocs("webapi.status", "HTTP status / response codes"));
 
-        this.define("response code should not be $code", function(
+        _doc = this.define("response code should not be $code", function(
             this: any,
             resp_code: string,
             done: Function
@@ -1143,20 +1094,10 @@ export class WebAPIDialect extends Dialect {
             Checks.ok(failed, "Status code is " + this.response.statusCode)
             // assert(failed, "Status code is " + this.response.statusCode);
             done();
-        });
+        }, _doc);
 
-        this.define(
-            [
-                "elapsed time should be less than $elapsed",
-                "duration should be less than $elapsed"
-            ],
-            function(this: any, elapsed: number, done: Function) {
-                assert(this.stopwatch.duration < elapsed);
-                done();
-            }
-        );
 
-        this.define("header $header should be $value", function(
+        _doc = this.define("header $header should be $value", function(
             this: any,
             header: string,
             value: string,
@@ -1173,9 +1114,9 @@ export class WebAPIDialect extends Dialect {
                     this.response.headers[header]
             );
             done();
-        });
+        }, new DialectDocs("webapi.headers", "Test HTTP headers for values"));
 
-        this.define("header $header should contain $value", function(
+        _doc = this.define("header $header should contain $value", function(
             this: any,
             header: string,
             value: string,
@@ -1192,9 +1133,9 @@ export class WebAPIDialect extends Dialect {
                     this.response.headers[header]
             );
             done();
-        });
+        }, _doc);
 
-        this.define("header $header should not be $value", function(
+        _doc = this.define("header $header should not be $value", function(
             this: any,
             header: string,
             value: string,
@@ -1206,9 +1147,9 @@ export class WebAPIDialect extends Dialect {
                 "Header " + header + " should not match " + value
             );
             done();
-        });
+        }, _doc);
 
-        this.define("header $header should exist", function(
+        _doc = this.define("header $header should exist", function(
             this: any,
             header: string,
             done: Function
@@ -1219,9 +1160,9 @@ export class WebAPIDialect extends Dialect {
                 "Missing " + header + " header"
             );
             done();
-        });
+        }, _doc);
 
-        this.define("header $header should not exist", function(
+        _doc = this.define("header $header should not exist", function(
             this: any,
             header: string,
             done: Function
@@ -1232,9 +1173,9 @@ export class WebAPIDialect extends Dialect {
                 "Found " + header + " header"
             );
             done();
-        });
+        }, _doc);
 
-        this.define(/^response body should be valid (xml|json)$/, function(
+        _doc = this.define(/^response body should be valid (xml|json)$/, function(
             this: any,
             contentType: string,
             done: Function
@@ -1248,9 +1189,9 @@ export class WebAPIDialect extends Dialect {
                     contentType.toUpperCase()
             );
             done();
-        });
+        }, new DialectDocs("webapi.body", "Test HTTP body for values"));
 
-        this.define(
+        _doc = this.define(
             "/^response body should not be valid (xml|json)$/",
             function(this: any, contentType: string, done: Function) {
                 let simpleType = HTTP.detectContentType(this.response.body);
@@ -1260,9 +1201,9 @@ export class WebAPIDialect extends Dialect {
                 );
                 done();
             }
-        );
+        , _doc);
 
-        this.define("response body should contain $expression", function(
+        _doc = this.define("response body should contain $expression", function(
             this: any,
             expression: string,
             done: Function
@@ -1270,9 +1211,9 @@ export class WebAPIDialect extends Dialect {
             let found = new RegExp(expression).test(this.response.body);
             assert(found, "Body does not contain /" + expression + "/");
             done();
-        });
+        }, _doc);
 
-        this.define("response body should not contain $expression", function(
+        _doc = this.define("response body should not contain $expression", function(
             this: any,
             expression: string,
             done: Function
@@ -1280,9 +1221,9 @@ export class WebAPIDialect extends Dialect {
             let found = new RegExp(expression).test(this.response.body);
             assert(!found, "Body contains /" + expression + "/");
             done();
-        });
+        }, _doc);
 
-        this.define(/^response body path (.*) should exist/, function(
+        _doc = this.define(/^response body path (.*) should exist/, function(
             this: any,
             path: string,
             done: Function
@@ -1290,9 +1231,9 @@ export class WebAPIDialect extends Dialect {
             let found = HTTP.findInPath(this.response.body, path);
             assert(found, "Body path " + path + " not found");
             done();
-        });
+        }, _doc);
 
-        this.define(/^response body path (.*) should not exist/, function(
+        _doc = this.define(/^response body path (.*) should not exist/, function(
             this: any,
             path: string,
             done: Function
@@ -1300,9 +1241,9 @@ export class WebAPIDialect extends Dialect {
             let found = HTTP.findInPath(this.response.body, path);
             assert(!found, "Body path " + path + " was found");
             done();
-        });
+        }, _doc);
 
-        this.define(
+        _doc = this.define(
             [
                 /^response body path (.*) should be ((?!of type).+)$/,
                 /^response body path (.*) should contain ((?!of type).+)$/
@@ -1324,10 +1265,9 @@ export class WebAPIDialect extends Dialect {
                         "/"
                 );
                 done();
-            }
-        );
+        }, _doc);
 
-        this.define(
+        _doc = this.define(
             [
                 /^response body path (.*) should not be ((?!of type).+)$/,
                 /^response body path (.*) should not contain ((?!of type).+)$/
@@ -1346,16 +1286,50 @@ export class WebAPIDialect extends Dialect {
                 );
                 done();
             }
-        );
+        , _doc);
 
-        this.define("cookie $cookie should exist", function(
+        /**
+         * Generate a TOTP token based on the shared secret and current time.
+         *
+         * @example
+         *
+         *     I use totp
+         *
+         */
+
+        _doc = this.define("I use totp", function(this: any, done: Function) {
+            let agent = this.agent;
+            assert(agent.totp, "Missing agent.totp");
+            assert(agent.totp.secret, "Missing agent.totp.secret");
+
+            agent.totp.token = speakeasy.totp({
+                secret: agent.totp.secret,
+                encoding: agent.totp.encoding || "base32",
+                step: agent.totp.step || 60
+            });
+
+            done();
+        }, new DialectDocs("webapi.totp", "One-time password"));
+
+        _doc = this.define("I use totp as $actor", function(
             this: any,
-            _cookie: string,
+            actor: string,
             done: Function
         ) {
-            this.request.jar = HTTP.cookies();
+            assert(this.agents, "Missing agents");
+            assert(this.agents[actor], "Missing agent " + actor);
+
+            let agent: any = this.agents[actor];
+
+            agent.totp.token = speakeasy.totp({
+                secret: agent.totp.secret,
+                encoding: agent.totp.encoding || "base32",
+                step: agent.totp.step || 60
+            });
+
             done();
         });
+
     }
 
     scope(scope: FeatureScope): FeatureScope {

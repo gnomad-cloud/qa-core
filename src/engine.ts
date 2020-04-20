@@ -2,7 +2,7 @@ import { Yadda, Library, Dictionary, Context } from "yadda";
 import { FeatureParser } from "yadda/lib/parsers";
 import { FeatureExport, ScenarioExport } from "yadda/lib/parsers/FeatureParser";
 import { ResultSet as TestResult, StepError, FeatureResult, ScenarioResult } from "./results";
-import { Dialect } from "./Dialect";
+import { Dialect, DialectDocs } from "./Dialect";
 import { EventEmitter } from "events";
 import { Converters } from "./helpers/converters";
 import * as glob from "glob";
@@ -279,6 +279,13 @@ export class Engine {
         });
     }
 
+    getDocs(): DialectDocs[] {
+        let docs = [];
+        this.dialects.forEach(dialect => {
+            docs = docs.concat(dialect.docs)
+        })
+        return docs as DialectDocs[];
+    }
 
     toError(err: any): string {
         if (err instanceof StepError) return err.message;

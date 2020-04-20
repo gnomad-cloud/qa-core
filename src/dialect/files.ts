@@ -1,5 +1,5 @@
 import { Engine, FeatureScope } from "../engine";
-import { Dialect } from "../Dialect";
+import { Dialect, DialectDocs } from "../Dialect";
 import { Files } from "../helpers/files";
 import { Vars } from "../helpers/vars";
 import * as _ from "lodash";
@@ -38,13 +38,13 @@ export class FilesDialect extends Dialect {
 				Vars.set(engine.vars, name, contents);
 				done();
 			});
-		});
+		}, new DialectDocs("files.load", "Load contents of file into a variable"));
 
 		this.define(["I mkdir $folder"], function (this: any, folder: string, done: Function) {
 			let path = Files.root(this.paths, folder);
 			mkdirp.sync(path);
 			done();
-		});
+		} , new DialectDocs("files.dir", "Create a directory/folder"));
 
 	}
 
