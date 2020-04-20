@@ -1148,7 +1148,7 @@ export class WebAPIDialect extends Dialect {
                 debug("set header %o to %o", name, value);
                 done();
             }
-        , new DialectDocs("webapi.headers", "HTTP headers"));
+        , new DialectDocs("webapi.headers", "Set HTTP header values"));
 
         /**
          * Set an HTTP Header from a variable
@@ -1330,7 +1330,7 @@ export class WebAPIDialect extends Dialect {
             });
 
             done();
-        });
+        }, _doc);
 
     }
 
