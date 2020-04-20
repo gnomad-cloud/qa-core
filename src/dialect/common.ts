@@ -29,7 +29,7 @@ export class CommonDialect extends Dialect {
 
         this.define(["I fail with $msg"], function (this: any, msg: string, _done: Function) {
             throw new StepError("Deliberate Fail: " + msg, this);
-        }, new DialectDocs("common.fail", "Deliberately fail - with custom error"));
+        }, doc);
 
         doc = this.define(["I pass", "I do nothing", "I succeed"], function (this: any, done: Function) {
             done();

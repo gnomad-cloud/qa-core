@@ -330,14 +330,14 @@ export class VarsDialect extends Dialect {
 			done();
 		}, doc);
 
-		this.define(["I merge $varnames as $newvar", "I merge $varnames into $newvar"], function (this: any, varnames: string, newvar: string, done: Function) {
+		this.define(["I merge $varnames as $varname2", "I merge $varnames into $varname2"], function (this: any, varnames: string, varname2: string, done: Function) {
 			let names = varnames.split(",");
 			let result = {};
 			_.each(names, function (name: string) {
 				let found = Vars.findNamed(self, name) || {};
 				_.extend(result, found);
 			})
-			Vars.set(this, newvar, result);
+			Vars.set(this, varname2, result);
 			done();
 		}, doc);
 
@@ -355,12 +355,12 @@ export class VarsDialect extends Dialect {
 		 * @param {String} javascript - inline javascript
 		 */
 
-		this.define(["I transform $varname as $newvar with:\n$javascript", 
-				"I map $varname as $newvar with:\n$javascript"], function (this: any, varname: string, newvar: string, js: string, done: Function) {
+		this.define(["I transform $varname as $varname2 with:\n$javascript", 
+				"I map $varname as $varname2 with:\n$javascript"], function (this: any, varname: string, varname2: string, js: string, done: Function) {
 			let fn = new Function(js);
 			let original = Vars.find(this, varname) || [];
 			let results = _.map(original, fn);
-			Vars.set(this, newvar, results);
+			Vars.set(this, varname2, results);
 			done();
 		}, doc);
 
